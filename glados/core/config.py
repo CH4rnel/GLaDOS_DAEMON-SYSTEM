@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 class ConfigLoader:
     """
-    Loading configuration ARCH4N.
+    Loading configuration GLaDOS.
     """
 
     def __init__(self):

@@ -7,10 +7,9 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 class ConfigLoader:
     """
-    Загружает конфигурацию ARCH4N.
-
-    Отвечает только за чтение настроек.
-    Не содержит бизнес-логики.
+	Loads the GLaDOS configuration.
+    	Responsible only for reading settings.
+   	 Contains no business logic.
     """
 
     def __init__(self):
@@ -19,7 +18,7 @@ class ConfigLoader:
 
     def load_identity(self) -> dict:
         """
-        Загружает identity.yaml
+        Loads identity.yaml
         """
 
         identity_file = (

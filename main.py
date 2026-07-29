@@ -1,9 +1,8 @@
-from arch4n.core.agent import ARCH4NAgent
-
+from glados.core.agent import GLaDOSAgent
 
 def main():
 
-    agent = ARCH4NAgent()
+    agent = GLaDOSAgent()
 
     agent.introduce()
 

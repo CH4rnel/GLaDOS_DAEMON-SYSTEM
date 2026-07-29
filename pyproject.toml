@@ -1,5 +1,5 @@
 [project]
-name = "arch4n-daemon-agent"
+name = "glados-daemon-system"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"

@@ -1,11 +1,10 @@
-from arch4n.core.config import ConfigLoader
-from arch4n.core.logger import setup_logger
+from glados.core.config import ConfigLoader
+from glados.core.logger import setup_logger
 
 
-class ARCH4NAgent:
+class GLaDOSAgent:
 
     def __init__(self):
-
         self.logger = setup_logger()
 
         self.config = ConfigLoader()
@@ -17,13 +16,9 @@ class ARCH4NAgent:
 
     def introduce(self):
 
-        name = (
-            self.identity["name"]
-        )
+        name = self.identity["name"]
 
-        purpose = (
-            self.identity["purpose"]
-        )
+        purpose = self.identity["purpose"]
 
         self.logger.info(
             f"{name} initialized"
