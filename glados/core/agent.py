@@ -1,16 +1,15 @@
-from glados.config.loader import ConfigLoader
-from glados.utils.logger import setup_logger
-from glados.core.identity import Identity
+# ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
 
+from glados.brain import BrainEngine
 from glados.config.loader import ConfigLoader
-from glados.utils.logger import setup_logger
+from glados.core.context import RuntimeContext
 from glados.core.identity import Identity
+from glados.utils.logger import setup_logger
 
 
 class GLaDOSAgent:
     """
-    Core runtime object of the GLaDOS system.
-    Responsible only for orchestration.
+    Core runtime object.
     """
 
     def __init__(self):
@@ -22,10 +21,14 @@ class GLaDOSAgent:
             self.config.load_identity()
         )
 
-    def introduce(self) -> None:
-        """
-        Displays startup banner.
-        """
+        self.ctx = RuntimeContext(
+            identity=self.identity,
+            logger=self.logger,
+        )
+
+        self.brain = BrainEngine(self.ctx)
+
+    def introduce(self):
 
         self.logger.info(
             f"{self.identity.name} initialized"
@@ -56,35 +59,5 @@ Status:
 ONLINE
 
 ========================================
-"""
-        )
-
-    def status(self) -> None:
-        """
-        Prints current runtime information.
-        """
-
-        print(
-            f"""
-Agent:
-{self.identity.name}
-
-Codename:
-{self.identity.codename}
-
-Version:
-{self.identity.version}
-
-Owner:
-{self.identity.owner["username"]}
-
-Environment:
-{self.identity.owner["environment"]}
-
-Purpose:
-{self.identity.purpose}
-
-Mode:
-{self.identity.system["mode"]}
 """
         )

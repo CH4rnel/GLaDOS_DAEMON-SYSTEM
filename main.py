@@ -1,3 +1,5 @@
+# ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
+
 from glados.core.agent import GLaDOSAgent
 
 def main():

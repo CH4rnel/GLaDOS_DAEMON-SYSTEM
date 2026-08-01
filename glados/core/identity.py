@@ -1,12 +1,10 @@
+# ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
+
 from dataclasses import dataclass
 
 
 @dataclass(slots=True)
 class Identity:
-    """
-    Runtime representation of GLaDOS identity.
-    """
-
     name: str
     codename: str
     version: str

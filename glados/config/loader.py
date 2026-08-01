@@ -1,3 +1,5 @@
+# ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
+
 from pathlib import Path
 
 import yaml
@@ -10,27 +12,16 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 class ConfigLoader:
     """
-    Loads GLaDOS configuration files.
-
-    Responsible only for reading configuration data and converting
-    it into strongly typed runtime objects.
+    Loads configuration files.
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.config_dir = BASE_DIR / "configs"
 
     def load_identity(self) -> Identity:
-        """
-        Load the identity configuration.
-
-        Returns:
-            Identity: Runtime identity object.
-        """
-
         identity_file = self.config_dir / "identity.yaml"
 
-        with open(
-            identity_file,
+        with identity_file.open(
             "r",
             encoding="utf-8",
         ) as file:
