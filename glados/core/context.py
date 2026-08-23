@@ -6,10 +6,14 @@ Provides shared state and dependencies across the application.
 """
 
 from dataclasses import dataclass, field
-from loguru import Logger
+from typing import TYPE_CHECKING
 
+from loguru import Logger
 from glados.core.identity import Identity
-from glados.memory.manager import MemoryManager
+
+# Use TYPE_CHECKING to avoid circular imports if MemoryManager imports Context later
+if TYPE_CHECKING:
+    from glados.memory.manager import MemoryManager
 
 
 @dataclass(slots=True)
@@ -20,4 +24,4 @@ class RuntimeContext:
     """
     identity: Identity
     logger: Logger
-    memory: MemoryManager = field(default=None) # Will be initialized in Agent
+    memory: "MemoryManager" = field(default=None)  # type: ignore
