@@ -11,6 +11,7 @@ from loguru import logger
 from pydantic import BaseModel, Field
 
 from glados.core.context import RuntimeContext
+from glados.brain.planner import Planner, Plan
 
 
 class TaskInput(BaseModel):
@@ -40,14 +41,16 @@ class BrainEngine:
         :param ctx: Global execution context containing Identity and Logger.
         """
         self._ctx = ctx
-        # Create a child logger bound to the module for tracing
         self.logger = ctx.logger.bind(component="BrainEngine")
         
-        self.logger.debug("BrainEngine initialized successfully.")
+        # Initialize subsystems
+        self.planner = Planner()
+        
+        self.logger.debug("BrainEngine initialized successfully with Planner.")
 
     async def process_task(self, task: TaskInput) -> ExecutionResult:
         """
-        Processes an incoming task. (Async version for future LLM/Tools integration).
+        Processes an incoming task. Orchestrates planning, memory, and execution.
         
         :param task: Validated input task model.
         :return: Structured execution result.
@@ -59,16 +62,22 @@ class BrainEngine:
         )
 
         try:
-            # TODO (Phase 2): Invoke planning subsystem (Planner) here
-            # TODO (Phase 3): Query memory subsystem (Memory) here
-            # TODO (Phase 4-5): Execute skills and tools (Skills/Tools) here
+            # Phase 2: Planning
+            plan: Plan = self.planner.create_plan(task)
+            self.logger.info(f"Plan generated with {len(plan.steps)} steps.")
             
-            result_message = f"Task '{task.description}' accepted for processing. Awaiting planner implementation."
+            # TODO (Phase 3): Query memory subsystem (Memory) here
+            # TODO (Phase 4-5): Execute skills and tools (Skills/Tools) here based on the plan
+            
+            result_message = f"Task '{task.description}' planned successfully. Awaiting execution phase."
             
             return ExecutionResult(
                 success=True,
                 message=result_message,
-                data={"status": "pending_implementation"}
+                data={
+                    "status": "planned",
+                    "plan_steps_count": len(plan.steps)
+                }
             )
             
         except Exception as e:
