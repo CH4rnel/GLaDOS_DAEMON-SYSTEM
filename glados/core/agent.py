@@ -12,6 +12,10 @@ from glados.config.loader import ConfigLoader
 from glados.core.context import RuntimeContext
 from glados.core.identity import Identity
 from glados.memory.manager import MemoryManager
+from glados.skills.registry import SkillRegistry
+from glados.skills.loader import SkillLoader
+from glados.tools.registry import ToolRegistry
+from glados.tools.loader import ToolLoader
 from glados.utils.logger import setup_logger
 
 
@@ -30,21 +34,32 @@ class GLaDOSAgent:
         self.identity: Identity = self.config.load_identity()
 
         # 3. Initialize Memory Subsystem (Phase 3)
-        # Using a default path in the project root 'data' directory
         memory_path = Path("data/omnissiah_memory.json")
         self.memory = MemoryManager(
             stm_max_size=50,
             ltm_path=memory_path
         )
 
-        # 4. Build Runtime Context with all core dependencies
+        # 4. Initialize Skill Subsystem (Phase 4)
+        self.skills = SkillRegistry()
+        skill_loader = SkillLoader(search_path=Path("glados/skills/builtin"))
+        skill_loader.load_all(self.skills)
+
+        # 5. Initialize Tool Subsystem (Phase 5)
+        self.tools = ToolRegistry()
+        tool_loader = ToolLoader(search_path=Path("glados/tools/builtin"))
+        tool_loader.load_all(self.tools)
+
+        # 6. Build Runtime Context with all core dependencies
         self.ctx = RuntimeContext(
             identity=self.identity,
             logger=self.logger,
             memory=self.memory,
+            skills=self.skills,
+            tools=self.tools,
         )
 
-        # 5. Initialize Brain Engine (Phase 2)
+        # 7. Initialize Brain Engine (Phase 2)
         self.brain = BrainEngine(self.ctx)
 
         self.logger.debug("GLaDOSAgent core subsystems initialized successfully.")
@@ -55,9 +70,11 @@ class GLaDOSAgent:
         """
         self.logger.info(f"{self.identity.name} initialized")
 
-        # Using .get() for safe dictionary access to prevent KeyError
         owner_user = self.identity.owner.get("username", "Unknown")
         owner_env = self.identity.owner.get("environment", "Unknown")
+
+        skills_count = len(self.skills.list_all()) if self.skills else 0
+        tools_count = len(self.tools.list_all()) if self.tools else 0
 
         print(
             f"""
@@ -79,6 +96,12 @@ Environment:
 
 Purpose:
 {self.identity.purpose}
+
+Loaded Skills:
+{skills_count}
+
+Loaded Tools:
+{tools_count}
 
 Status:
 ONLINE
