@@ -11,9 +11,10 @@ from typing import TYPE_CHECKING
 from loguru import Logger
 from glados.core.identity import Identity
 
-# Use TYPE_CHECKING to avoid circular imports if MemoryManager imports Context later
 if TYPE_CHECKING:
     from glados.memory.manager import MemoryManager
+    from glados.skills.registry import SkillRegistry
+    from glados.tools.registry import ToolRegistry
 
 
 @dataclass(slots=True)
@@ -25,3 +26,5 @@ class RuntimeContext:
     identity: Identity
     logger: Logger
     memory: "MemoryManager" = field(default=None)  # type: ignore
+    skills: "SkillRegistry" = field(default=None)  # type: ignore
+    tools: "ToolRegistry" = field(default=None)  # type: ignore
