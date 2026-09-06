@@ -1,0 +1,3 @@
+# Collapse diffs for lock files to avoid cluttering git diff output and PR
+uv.lock linguist-generated=true
+*.lock linguist-generated=true
