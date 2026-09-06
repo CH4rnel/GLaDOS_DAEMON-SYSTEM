@@ -1,9 +1,26 @@
+# ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
+
 [project]
 name = "glados-daemon-system"
 version = "0.1.0"
-description = "Add your description here"
+description = "Personal Autonomous AI Daemon for Arch Linux focused on system management, knowledge processing and future autonomous operation."
 readme = "README.md"
 requires-python = ">=3.14"
+license = { text = "MIT" }
+authors = [
+    { name = "CH4rnel", email = "CH4rnel@glados.local" }
+]
+keywords = ["ai", "daemon", "autonomous", "arch-linux", "glados", "llm", "agent"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Systems Administration",
+]
 dependencies = [
     "loguru>=0.7.3",
     "pydantic>=2.13.4",
@@ -14,9 +31,106 @@ dependencies = [
     "typer>=0.27.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "mypy>=2.3.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.16.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM"
+Repository = "https://github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM"
+Issues = "https://github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM/issues"
+Documentation = "https://github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM#readme"
+
+[project.scripts]
+glados = "main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [dependency-groups]
 dev = [
     "mypy>=2.3.0",
     "pytest>=9.1.1",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
     "ruff>=0.16.0",
+]
+
+# ============================================================================
+# Tool Configuration
+# ============================================================================
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+src = ["glados", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "E501", # line too long (handled by formatter)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["glados"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+[tool.coverage.run]
+source = ["glados"]
+omit = ["tests/*", "*/migrations/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.",
+    "raise NotImplementedError",
+    "pass",
+    "except ImportError",
 ]
