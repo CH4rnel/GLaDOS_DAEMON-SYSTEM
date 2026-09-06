@@ -3,13 +3,13 @@
 """
 Core package of GLaDOS.
 
-Contains the central agent implementation and core interfaces.
+Contains the central interfaces and runtime context.
 """
 
-from .agent import GLaDOSAgent
 from .identity import Identity
+from .context import RuntimeContext
 
 __all__ = [
-    "GLaDOSAgent",
     "Identity",
+    "RuntimeContext",
 ]
