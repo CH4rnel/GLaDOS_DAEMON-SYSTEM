@@ -6,9 +6,10 @@ Responsible for breaking down high-level tasks into executable steps.
 """
 
 from typing import Literal
+
 from pydantic import BaseModel, Field
 
-from glados.brain.engine import TaskInput
+from glados.brain.models import TaskInput
 
 
 class PlanStep(BaseModel):
@@ -39,41 +40,16 @@ class Planner:
         pass
 
     def create_plan(self, task: TaskInput) -> Plan:
-        """
-        Generates an execution plan for a given task.
-        
-        :param task: The validated input task.
-        :return: A structured Plan object.
-        """
-        # TODO (Phase 6): Replace this mock logic with LLM inference
-        steps = self._generate_mock_steps(task)
-        
+        """Generates an execution plan for a given task."""
         return Plan(
             task_description=task.description,
-            steps=steps
+            steps=self._generate_mock_steps(task)
         )
 
     def _generate_mock_steps(self, task: TaskInput) -> list[PlanStep]:
-        """
-        Generates deterministic mock steps for testing and bootstrapping.
-        
-        :param task: The input task.
-        :return: List of mock PlanSteps.
-        """
+        """Generates deterministic mock steps for testing and bootstrapping."""
         return [
-            PlanStep(
-                step_id=1, 
-                action="analyze", 
-                description=f"Analyze requirements for: {task.description}"
-            ),
-            PlanStep(
-                step_id=2, 
-                action="execute", 
-                description=f"Execute core logic for: {task.description}"
-            ),
-            PlanStep(
-                step_id=3, 
-                action="verify", 
-                description="Verify execution results and report status"
-            )
+            PlanStep(step_id=1, action="analyze", description=f"Analyze requirements for: {task.description}"),
+            PlanStep(step_id=2, action="execute", description=f"Execute core logic for: {task.description}"),
+            PlanStep(step_id=3, action="verify", description="Verify execution results and report status")
         ]
