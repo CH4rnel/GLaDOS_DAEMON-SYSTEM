@@ -1,353 +1,133 @@
-<img width="965" height="575" alt="ascii-art-text" src="https://github.com/user-attachments/assets/a2b161d2-4995-452b-90f8-25b7a73b8ddf" />
-# GLaDOS_DAEMON-SYSTEM
+# ♃ ☿ 𓂀 GLaDOS_DAEMON-SYSTEM 𓂀 ☿ ♃
 
-> **Personal Autonomous AI Daemon** for Arch Linux focused on system management, knowledge processing and future autonomous operation.
+![Python 3.14+](https://img.shields.io/badge/Python-3.14+-blue.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Tests](https://img.shields.io/badge/Tests-109%20Passing-brightgreen.svg)
+![Package Manager](https://img.shields.io/badge/Package%20Manager-uv-orange.svg)
 
----
+> *"For science. You monster."*
 
-# Overview
+**GLaDOS_DAEMON-SYSTEM** is a modular, autonomous AI daemon designed for Arch Linux. Its long-term goal is to become a reliable local AI assistant capable of system management, knowledge processing, intelligent workflow orchestration, and continuous background operation.
 
-**GLaDOS_DAEMON-SYSTEM** is a modular Python project whose long-term goal is to become a local AI daemon capable of assisting the operator, interacting with the operating system, managing knowledge, and orchestrating intelligent workflows.
-
-The project follows a clean layered architecture, where each subsystem has a single responsibility and can evolve independently.
-
-Current development status: **v0.1.0 (Bootstrap Architecture)**
+The project strictly follows **Clean Architecture**, **Test-Driven Development (TDD)**, and **Extreme Programming (XP)** principles, ensuring a robust, extensible, and loosely coupled codebase.
 
 ---
 
-# Project Goals
+## Current Development Status
 
-## Primary Goal
-
-Build a reliable autonomous AI assistant running locally on the user's machine.
-
-## Long-Term Vision
-
-The daemon should eventually be able to:
-
-* communicate with the user;
-* understand tasks;
-* plan actions;
-* interact with the operating system;
-* remember previous interactions;
-* execute tools safely;
-* integrate with external LLMs;
-* support plugins and extensions;
-* operate continuously as a background service.
+| Phase | Component | Status | Description |
+| :--- | :--- | :---: | :--- |
+| **Phase 1** | Bootstrap & Core | (check!) | Project init, `uv` env, Config, Identity, Logger, `RuntimeContext`. |
+| **Phase 2** | Brain & Planning | (check!) | `BrainEngine`, `Planner`, structured `TaskInput`/`ExecutionResult`. |
+| **Phase 3** | Memory Subsystem | (checK!) | `ShortTermMemory` (FIFO), `LongTermMemory` (JSON persistence), `MemoryManager`. |
+| **Phase 4** | Skill System | (check!) | `SkillRegistry`, dynamic `SkillLoader`, built-in skills. |
+| **Phase 5** | Tool System | (check!) | 8 atomic tools: `SystemInfo`, `Shell`, `FileSystem` (5), `Git`, `PythonExec` (with sandboxing/timeouts). |
+| **Phase 6** | LLM Integration | (soon) | **Foundation Complete:** `BaseLLMProvider`, `OllamaProvider`, `AgentProfile`, Multi-Agent Ecosystem models. |
+| **Phase 7** | Autonomous Mode | (soon) | Continuous runtime loop, scheduler, event handling, autonomous decision making. |
 
 ---
 
-# Current Architecture
+## 🏗 Architecture
+
+The system is built around a central **Composition Root** (`GLaDOSAgent`) that injects dependencies into a shared `RuntimeContext`. This ensures minimal global state and strict adherence to the Single Responsibility Principle (SRP).
 
 ```text
 main.py
-    │
-    ▼
-GLaDOSAgent
-    │
-    ▼
-RuntimeContext
-    │
- ┌──┴───────────────┐
- │                  │
-Identity        Logger
- │
-ConfigLoader
-```
+  │
+  ▼
+GLaDOSAgent (Composition Root)
+  │
+  ├── ConfigLoader (YAML/ENV)
+  ├── Identity (Runtime representation)
+  └── RuntimeContext (Shared State)
+        │
+        ├── Logger (Loguru)
+        ├── MemoryManager (STM + LTM)
+        ├── SkillRegistry (Dynamic loading)
+        ├── ToolRegistry (Dynamic loading)
+        └── BrainEngine (Orchestrator & Planner)
+              │
+              └── LLM Providers (Ollama, OpenAI, etc. - In Progress)
+
+              
+Key Features:
+
+    Strict TDD Workflow: 109+ automated tests covering models, business logic, edge cases, and async execution.
+    Modern Python Stack: Built for Python 3.14+ using uv for lightning-fast dependency management and packaging.
+    Robust Tooling: Safe, isolated execution of Shell commands, Git operations, Python scripts, and FileSystem manipulations with strict timeouts and output truncation.
+    Multi-Agent LLM Foundation: Designed to route tasks to various local (Ollama) and cloud (OpenAI, Anthropic, xAI, DeepSeek) agents via unified AgentProfile configurations.
+    Type Safety: Comprehensive pydantic v2 validation and mypy strict mode enforcement.
+
+Technology Stack:
+
+    Language: Python 3.14+
+    Package Manager: uv
+    Validation & Settings: pydantic v2, pydantic-settings, pyyaml, python-dotenv
+    Logging & CLI: loguru, typer, rich
+    Networking: httpx (async HTTP client)
+    Testing & Quality: pytest, pytest-asyncio, pytest-cov, ruff, mypy
+
+Getting Started:
+Prerequisites
+
+    Python 3.14 or higher
+    uv
+     installed on your system
+    (Optional) Ollama
+     running locally for LLM features
+
+Installation
+
+1 Clone the repository:
+git clone https://github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM.git
+
+2 Sync dependencies and create the virtual environment:
+uv sync 
+
+3 Run the daemon:
+uv run python main.py
+# Or use the CLI entry point (if configured in pyproject.toml)
+uv run glados
+
+Development & Testing
+This project strictly follows TDD. No feature is merged without passing tests.
+# Run all tests with verbose output and short tracebacks
+uv run pytest -v --tb=short
+
+# Run tests with coverage report
+uv run pytest --cov=glados --cov-report=term-missing
+
+# Lint and format code (Ruff)
+uv run ruff check glados/ tests/
+uv run ruff format glados/ tests/
+
+# Static type checking (MyPy)
+uv run mypy glados/
+
+
+Project Structure:
+GLaDOS_DAEMON-SYSTEM/
+├── glados/
+│   ├── brain/          # BrainEngine, Planner, LLM models & providers
+│   ├── cli/            # Typer-based command-line interface
+│   ├── config/         # YAML/ENV configuration loaders
+│   ├── core/           # GLaDOSAgent, Identity, RuntimeContext
+│   ├── llm/            # LLM Providers (Ollama, OpenAI, etc.) and routing
+│   ├── memory/         # Short-term and Long-term memory management
+│   ├── skills/         # High-level skill registry and dynamic loader
+│   ├── tools/          # Low-level atomic tools (Shell, FS, Git, Python)
+│   └── utils/          # Shared utilities (Logger setup, etc.)
+├── tests/              # Comprehensive TDD test suite
+├── data/               # Persistent storage (e.g., long_term_memory.json)
+├── configs/            # Default YAML configuration files
+├── main.py             # Application entry point
+├── pyproject.toml      # Project metadata, dependencies, and tool configs
+└── uv.lock             # Deterministic dependency lock file
+
+
+ License & Author
+
+    License: MIT License
+    Author: CH4rnel 𓂀CHAOSMASTER𓂀
+    Repository: github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM
 
----
-
-# Project Structure
-
-```text
-glados/
-│
-├── brain/
-├── cli/
-├── config/
-├── core/
-├── memory/
-├── skills/
-├── tools/
-└── utils/
-```
-
----
-
-# Implemented Components
-
-## Core
-
-Contains the main runtime logic.
-
-Current modules:
-
-* `GLaDOSAgent`
-* `Identity`
-* `RuntimeContext`
-
----
-
-## Config
-
-Responsible only for reading configuration files.
-
-Implemented:
-
-* YAML configuration loader
-* Identity loading
-
----
-
-## Identity
-
-Runtime representation of the assistant.
-
-Current fields include:
-
-* name
-* codename
-* version
-* owner
-* system
-* purpose
-* personality
-* principles
-
----
-
-## Runtime Context
-
-Provides shared runtime state across the application.
-
-Contains:
-
-* Identity
-* Logger
-
-This object will later be expanded with memory, brain, tools and skills.
-
----
-
-## Logger
-
-Centralized logging using **Loguru**.
-
-Responsibilities:
-
-* runtime logs;
-* diagnostics;
-* debugging;
-* future audit trail.
-
----
-
-# Development Milestones
-
-## Phase 1 — Bootstrap ✅
-
-Completed:
-
-* project initialization;
-* package structure;
-* uv environment;
-* pyproject configuration;
-* logging;
-* configuration loading;
-* runtime identity;
-* startup banner;
-* RuntimeContext.
-
----
-
-## Phase 2 — In Progress
-
-Planned:
-
-* Brain Engine;
-* planning system;
-* runtime state.
-
----
-
-## Phase 3
-
-Memory subsystem.
-
-Planned:
-
-* short-term memory;
-* persistent storage;
-* semantic search.
-
----
-
-## Phase 4
-
-Skill System.
-
-Planned:
-
-* skill registry;
-* built-in skills;
-* dynamic loading.
-
----
-
-## Phase 5
-
-Tool System.
-
-Planned:
-
-* shell execution;
-* filesystem access;
-* Git integration;
-* Python execution;
-* system information.
-
----
-
-## Phase 6
-
-LLM Integration.
-
-Planned support:
-
-* OpenAI;
-* Ollama;
-* local models;
-* configurable providers.
-
----
-
-## Phase 7
-
-Autonomous Mode.
-
-Planned:
-
-* continuous runtime loop;
-* scheduler;
-* event handling;
-* autonomous decision making.
-
----
-
-# Development History
-
-During the bootstrap stage several issues were resolved.
-
-## Configuration
-
-* invalid `pyproject.toml`;
-* dependency resolution issues.
-
-Resolved by correcting the TOML syntax and rebuilding the environment.
-
----
-
-## Python Environment
-
-Encountered conflicts between:
-
-* system Python;
-* pyenv;
-* uv virtual environment.
-
-Resolved by activating and consistently using the project `.venv`.
-
----
-
-## Dependency Issues
-
-Resolved:
-
-* `ModuleNotFoundError: yaml`
-* package installation inconsistencies.
-
----
-
-## Runtime Issues
-
-Resolved:
-
-* dataclass import errors;
-* missing Identity fields;
-* duplicate imports;
-* runtime context initialization;
-* BrainEngine import scaffolding;
-* logger typing issues;
-* indentation errors.
-
----
-
-# Design Principles
-
-The project follows:
-
-* Clean Architecture;
-* Single Responsibility Principle;
-* modular design;
-* explicit dependency injection;
-* typed Python;
-* configuration-first approach;
-* minimal global state.
-
----
-
-# Technology Stack
-
-* Python 3.14
-* uv
-* PyYAML
-* Loguru
-* Pydantic
-* Typer
-* Rich
-
----
-
-# Current Status
-
-Current version:
-
-**v0.1.0**
-
-Implemented:
-
-* project bootstrap;
-* configuration layer;
-* identity layer;
-* runtime context;
-* logging;
-* startup sequence.
-
-The project is now ready for implementation of the **Brain Engine**, which will become the central orchestration component of the system.
-
----
-
-# Next Steps
-
-1. Implement `BrainEngine`.
-2. Add planning subsystem.
-3. Introduce memory manager.
-4. Build skill registry.
-5. Build tool registry.
-6. Add CLI commands.
-7. Integrate LLM providers.
-8. Implement autonomous runtime loop.
-
----
-
-# License
-
-Apache License
-
----
-
-# Author
-
-**CH4rnel**
-
-Project: **GLaDOS_DAEMON-SYSTEM**
