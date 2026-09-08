@@ -1,0 +1,1 @@
+The glados/llm/ module provides the foundation for integrating GLaDOS with external and local large language models. It is designed to support a multi-agent ecosystem in which GLaDOS can route tasks to various specialized agents (Ollama, OpenAI, Claude, Grok, etc.).
