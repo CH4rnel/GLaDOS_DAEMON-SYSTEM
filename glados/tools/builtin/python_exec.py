@@ -1,4 +1,4 @@
-# ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
 Built-in Python Execution Tool.
@@ -76,6 +76,7 @@ class PythonExecTool(BaseTool):
         ctx.logger.info(f"PythonExecTool: executing code snippet (timeout={timeout}s, max_output={max_output}B)")
 
         # Create a temporary file for the code to avoid passing via command line args
+        tmp_path = None
         try:
             with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False, encoding="utf-8") as tmp_file:
                 tmp_file.write(code)
@@ -100,14 +101,21 @@ class PythonExecTool(BaseTool):
                 stdout = stdout_bytes.decode("utf-8", errors="replace")
                 stderr = stderr_bytes.decode("utf-8", errors="replace")
 
-                # Truncate output if it exceeds limits
+                # Truncate output if it exceeds limits, reserving space for the truncation message
+                truncation_msg = "\n[OUTPUT TRUNCATED]"
+                truncation_msg_bytes = len(truncation_msg.encode("utf-8"))
                 truncated = False
+
                 if len(stdout.encode("utf-8")) > max_output:
-                    stdout = stdout.encode("utf-8")[:max_output].decode("utf-8", errors="ignore") + "\n[OUTPUT TRUNCATED]"
+                    # Reserve space for truncation message to ensure final size <= max_output
+                    limit = max(0, max_output - truncation_msg_bytes)
+                    stdout = stdout.encode("utf-8")[:limit].decode("utf-8", errors="ignore") + truncation_msg
                     truncated = True
                 
                 if len(stderr.encode("utf-8")) > max_output:
-                    stderr = stderr.encode("utf-8")[:max_output].decode("utf-8", errors="ignore") + "\n[OUTPUT TRUNCATED]"
+                    # Reserve space for truncation message to ensure final size <= max_output
+                    limit = max(0, max_output - truncation_msg_bytes)
+                    stderr = stderr.encode("utf-8")[:limit].decode("utf-8", errors="ignore") + truncation_msg
                     truncated = True
 
                 returncode = process.returncode or 0
@@ -161,8 +169,9 @@ class PythonExecTool(BaseTool):
             }
         finally:
             # Cleanup temporary file
-            try:
-                Path(tmp_path).unlink(missing_ok=True)
-                ctx.logger.debug(f"PythonExecTool: cleaned up temporary file {tmp_path}")
-            except Exception as e:
-                ctx.logger.warning(f"PythonExecTool: failed to cleanup temp file {tmp_path}: {e}")
+            if tmp_path:
+                try:
+                    Path(tmp_path).unlink(missing_ok=True)
+                    ctx.logger.debug(f"PythonExecTool: cleaned up temporary file {tmp_path}")
+                except Exception as e:
+                    ctx.logger.warning(f"PythonExecTool: failed to cleanup temp file {tmp_path}: {e}")
