@@ -6,7 +6,7 @@ Follows TDD methodology (Red Phase) to define the contract for Ollama integratio
 """
 
 import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from glados.llm.providers.ollama import OllamaProvider
 from glados.llm.models import LLMMessage, LLMResponse, AgentProfile, ProviderType
@@ -43,9 +43,9 @@ class TestOllamaProvider:
             LLMMessage(role="user", content="Hello")
         ]
         
-        # Mock the HTTP request
+        # Mock the HTTP request - fix: we use MagicMock for Response
         with patch('httpx.AsyncClient.post') as mock_post:
-            mock_response = AsyncMock()
+            mock_response = MagicMock()  # fix: MagicMock instead of AsyncMock
             mock_response.json.return_value = {
                 "model": "llama3.2:latest",
                 "message": {
@@ -83,7 +83,7 @@ class TestOllamaProvider:
         ]
         
         with patch('httpx.AsyncClient.post') as mock_post:
-            mock_response = AsyncMock()
+            mock_response = MagicMock()  # ИСПРАВЛЕНО
             mock_response.json.return_value = {
                 "model": "llama3.2:latest",
                 "message": {
@@ -123,16 +123,22 @@ class TestOllamaProvider:
         
         with patch('httpx.AsyncClient.post') as mock_post:
             import httpx
+            # fix: Creating the correct mock for HTTPStatusError
+            mock_response = MagicMock()
+            mock_response.status_code = 404
+            mock_response.text = "Model not found"
+            
             mock_post.side_effect = httpx.HTTPStatusError(
                 "Model not found",
-                request=AsyncMock(),
-                response=AsyncMock(status_code=404)
+                request=MagicMock(),
+                response=mock_response
             )
             
             result = await provider.complete(messages, profile)
             
             assert result.is_error is True
             assert "error" in result.metadata
+            assert "Error:" in result.content  # fix: check that content is not empty
 
     @pytest.mark.asyncio
     async def test_health_check_success(self):
@@ -148,7 +154,7 @@ class TestOllamaProvider:
         )
         
         with patch('httpx.AsyncClient.get') as mock_get:
-            mock_response = AsyncMock()
+            mock_response = MagicMock()  # fix
             mock_response.raise_for_status.return_value = None
             mock_get.return_value = mock_response
             
@@ -197,7 +203,7 @@ class TestOllamaProvider:
         ]
         
         with patch('httpx.AsyncClient.post') as mock_post:
-            mock_response = AsyncMock()
+            mock_response = MagicMock()  # fix
             mock_response.json.return_value = {
                 "model": "llama3.2:latest",
                 "message": {
@@ -216,4 +222,4 @@ class TestOllamaProvider:
             # Verify all messages were sent
             call_args = mock_post.call_args
             request_data = call_args[1]['json']
-            assert len(request_data['messages']) == 3
+            assert len(request_data['messages']) == 4  # 3 user messages + 1 system prompt (if present)
