@@ -1,4 +1,4 @@
-# ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 [project]
 name = "glados-daemon-system"
@@ -29,6 +29,7 @@ dependencies = [
     "pyyaml>=6.0.3",
     "rich>=15.0.0",
     "typer>=0.27.0",
+    "httpx>=0.28.1",
 ]
 
 [project.optional-dependencies]
@@ -61,10 +62,6 @@ dev = [
     "pytest-cov>=7.0.0",
     "ruff>=0.16.0",
 ]
-
-# ============================================================================
-# Tool Configuration
-# ============================================================================
 
 [tool.hatch.build.targets.wheel]
 packages = ["glados"]
