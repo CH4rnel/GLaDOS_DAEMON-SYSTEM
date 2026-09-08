@@ -1,0 +1,32 @@
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
+
+# Agent Profiles Configuration
+# Environment variables can be substituted using ${VAR_NAME} syntax
+
+agents:
+  - agent_id: local_qwen_coder
+    display_name: Local Qwen Coder
+    provider: ollama
+    model: qwen2.5-coder:7b
+    base_url: ${OLLAMA_BASE_URL}
+    system_prompt: "You are an expert Python developer. Write clean, efficient, and well-documented code."
+    temperature: 0.3
+    tags: ["coding", "python", "fast"]
+
+  - agent_id: gpt4_analyst
+    display_name: GPT-4 Analyst
+    provider: openai
+    model: gpt-4-turbo
+    api_key: ${OPENAI_API_KEY}
+    system_prompt: "You are a system analyst. Analyze logs, identify anomalies, and provide actionable insights."
+    temperature: 0.5
+    tags: ["analysis", "security", "deep-thinking"]
+
+  - agent_id: claude_writing
+    display_name: Claude Writing Assistant
+    provider: anthropic
+    model: claude-3-5-sonnet-20241022
+    api_key: ${ANTHROPIC_API_KEY}
+    system_prompt: "You are a technical writer. Create clear, concise, and well-structured documentation."
+    temperature: 0.7
+    tags: ["writing", "documentation"]
