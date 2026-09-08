@@ -37,5 +37,6 @@ class PlanStep(BaseModel):
 
 class Plan(BaseModel):
     """Represents a complete execution plan for a task."""
+    # FIX: Added min_length=1 to disallow empty strings.
     task_description: str = Field(..., min_length=1, description="Original task description")
     steps: list[PlanStep] = Field(default_factory=list, description="Ordered list of steps")
