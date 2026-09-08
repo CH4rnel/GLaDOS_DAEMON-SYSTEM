@@ -49,8 +49,8 @@ GLaDOSAgent (Composition Root)
               │
               └── LLM Providers (Ollama, OpenAI, etc. - In Progress)
 
-              
-Key Features:
+
+## Key Features:
 
     Strict TDD Workflow: 109+ automated tests covering models, business logic, edge cases, and async execution.
     Modern Python Stack: Built for Python 3.14+ using uv for lightning-fast dependency management and packaging.
@@ -58,7 +58,7 @@ Key Features:
     Multi-Agent LLM Foundation: Designed to route tasks to various local (Ollama) and cloud (OpenAI, Anthropic, xAI, DeepSeek) agents via unified AgentProfile configurations.
     Type Safety: Comprehensive pydantic v2 validation and mypy strict mode enforcement.
 
-Technology Stack:
+## Technology Stack:
 
     Language: Python 3.14+
     Package Manager: uv
@@ -67,8 +67,8 @@ Technology Stack:
     Networking: httpx (async HTTP client)
     Testing & Quality: pytest, pytest-asyncio, pytest-cov, ruff, mypy
 
-Getting Started:
-Prerequisites
+## Getting Started:
+   Prerequisites
 
     Python 3.14 or higher
     uv
@@ -76,7 +76,7 @@ Prerequisites
     (Optional) Ollama
      running locally for LLM features
 
-Installation
+## Installation
 
 1 Clone the repository:
 git clone https://github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM.git
@@ -89,7 +89,7 @@ uv run python main.py
 # Or use the CLI entry point (if configured in pyproject.toml)
 uv run glados
 
-Development & Testing
+## Development & Testing
 This project strictly follows TDD. No feature is merged without passing tests.
 # Run all tests with verbose output and short tracebacks
 uv run pytest -v --tb=short
@@ -105,7 +105,7 @@ uv run ruff format glados/ tests/
 uv run mypy glados/
 
 
-Project Structure:
+## Project Structure:
 GLaDOS_DAEMON-SYSTEM/
 ├── glados/
 │   ├── brain/          # BrainEngine, Planner, LLM models & providers
