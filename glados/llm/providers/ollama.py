@@ -62,9 +62,10 @@ class OllamaProvider(BaseLLMProvider):
                 return self._parse_response(data, profile)
                 
         except httpx.HTTPStatusError as e:
-            self.logger.error(f"Ollama API error: {e.response.status_code} - {e.response.text}")
+            error_msg = f"HTTP {e.response.status_code}: {e.response.text}"
+            self.logger.error(f"Ollama API error: {error_msg}")
             return LLMResponse(
-                content="",
+                content=f"Error: {error_msg}",  # fix: meaningful text, empty lines
                 model=profile.model,
                 provider=ProviderType.OLLAMA,
                 is_error=True,
@@ -74,9 +75,10 @@ class OllamaProvider(BaseLLMProvider):
                 }
             )
         except httpx.ConnectError as e:
+            error_msg = f"Connection failed: {str(e)}"
             self.logger.error(f"Cannot connect to Ollama at {base_url}: {e}")
             return LLMResponse(
-                content="",
+                content=f"Error: {error_msg}",  # fix
                 model=profile.model,
                 provider=ProviderType.OLLAMA,
                 is_error=True,
@@ -86,9 +88,10 @@ class OllamaProvider(BaseLLMProvider):
                 }
             )
         except Exception as e:
+            error_msg = f"Unexpected error: {str(e)}"
             self.logger.error(f"Unexpected error in OllamaProvider: {e}", exc_info=True)
             return LLMResponse(
-                content="",
+                content=f"Error: {error_msg}",  # fix
                 model=profile.model,
                 provider=ProviderType.OLLAMA,
                 is_error=True,
