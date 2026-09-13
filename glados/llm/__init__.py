@@ -12,6 +12,7 @@ from glados.llm.models import (
     ProviderType,
 )
 from glados.llm.base import BaseLLMProvider
+from glados.llm.registry import LLMRegistry, AgentNotFoundError
 
 __all__ = [
     "AgentProfile",
@@ -19,4 +20,6 @@ __all__ = [
     "LLMResponse",
     "ProviderType",
     "BaseLLMProvider",
+    "LLMRegistry",
+    "AgentNotFoundError",
 ]
