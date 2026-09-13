@@ -16,8 +16,9 @@ if TYPE_CHECKING:
     from glados.skills.registry import SkillRegistry
     from glados.tools.registry import ToolRegistry
     from glados.llm.registry import LLMRegistry
+    from glados.llm.router import LLMRouter
 
-# Standard way to type-hint the loguru logger
+# Standard method for typing the journal
 LoggerType = type(logger)
 
 
@@ -33,3 +34,4 @@ class RuntimeContext:
     skills: "SkillRegistry" = field(default=None)  # type: ignore
     tools: "ToolRegistry" = field(default=None)  # type: ignore
     llm_agents: "LLMRegistry" = field(default=None)  # type: ignore
+    llm_router: "LLMRouter" = field(default=None)  # type: ignore
