@@ -17,6 +17,9 @@ from glados.skills.loader import SkillLoader
 from glados.tools.registry import ToolRegistry
 from glados.tools.loader import ToolLoader
 from glados.llm.registry import LLMRegistry
+from glados.llm.router import LLMRouter
+from glados.llm.providers.ollama import OllamaProvider
+from glados.llm.providers.openai import OpenAIProvider
 from glados.utils.logger import setup_logger
 
 
@@ -60,7 +63,21 @@ class GLaDOSAgent:
             except ValueError as e:
                 self.logger.warning(f"Failed to register agent profile: {e}")
 
-        # 7. Build Runtime Context with all core dependencies
+        # 7. Initialize LLM Router (Phase 6)
+        self.llm_router = LLMRouter(self.llm_agents)
+        
+        # Register providers for different provider types
+        # In production, these would be configured via config
+        self.llm_router.register_provider(
+            ProviderType.OLLAMA,
+            OllamaProvider()
+        )
+        self.llm_router.register_provider(
+            ProviderType.OPENAI,
+            OpenAIProvider()
+        )
+
+        # 8. Build Runtime Context with all core dependencies
         self.ctx = RuntimeContext(
             identity=self.identity,
             logger=self.logger,
@@ -68,9 +85,10 @@ class GLaDOSAgent:
             skills=self.skills,
             tools=self.tools,
             llm_agents=self.llm_agents,
+            llm_router=self.llm_router,
         )
 
-        # 8. Initialize Brain Engine (Phase 2)
+        # 9. Initialize Brain Engine (Phase 2)
         self.brain = BrainEngine(self.ctx)
 
         self.logger.debug("GLaDOSAgent core subsystems initialized successfully.")
@@ -87,6 +105,7 @@ class GLaDOSAgent:
         skills_count = len(self.skills.list_all()) if self.skills else 0
         tools_count = len(self.tools.list_all()) if self.tools else 0
         agents_count = len(self.llm_agents.list_all()) if self.llm_agents else 0
+        active_agents_count = len(self.llm_agents.get_active()) if self.llm_agents else 0
 
         print(
             f"""
@@ -116,7 +135,7 @@ Loaded Tools:
 {tools_count}
 
 Loaded LLM Agents:
-{agents_count}
+{agents_count} ({active_agents_count} active)
 
 Status:
 ONLINE
