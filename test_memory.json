@@ -36,5 +36,43 @@
       "priority": 5,
       "preferred_tag": "coding"
     }
+  },
+  {
+    "id": "308f90fa-0fb7-4b70-9b57-b277fc0e7075",
+    "timestamp": "2026-09-13T20:50:35.730568Z",
+    "role": "user",
+    "content": "Task received: Test task for LLM planning",
+    "metadata": {
+      "priority": 3
+    }
+  },
+  {
+    "id": "7c3f71ae-b9ba-478f-8c0d-7eb94d7158bb",
+    "timestamp": "2026-09-13T20:50:35.735064Z",
+    "role": "user",
+    "content": "Task received: Test task without LLM",
+    "metadata": {
+      "priority": 2
+    }
+  },
+  {
+    "id": "23ee681b-dd37-4194-a217-adf07fbbb616",
+    "timestamp": "2026-09-13T20:50:35.739598Z",
+    "role": "user",
+    "content": "Task received: Task for specific agent",
+    "metadata": {
+      "priority": 4,
+      "preferred_agent": "specific_agent"
+    }
+  },
+  {
+    "id": "d37cbc13-ed69-4ed2-9791-e7451391c69b",
+    "timestamp": "2026-09-13T20:50:35.743872Z",
+    "role": "user",
+    "content": "Task received: Coding task",
+    "metadata": {
+      "priority": 5,
+      "preferred_tag": "coding"
+    }
   }
 ]
