@@ -58,6 +58,7 @@ class TestBrainEngineLLMIntegration:
             codename="Test",
             version="0.1.0",
             owner={"username": "test", "environment": "test"},
+            system={"os": "Linux", "arch": "x86_64"},  # fix: added system field
             purpose="Testing",
             personality={},
             principles=[]
