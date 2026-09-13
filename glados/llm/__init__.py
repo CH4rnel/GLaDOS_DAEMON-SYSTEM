@@ -13,6 +13,7 @@ from glados.llm.models import (
 )
 from glados.llm.base import BaseLLMProvider
 from glados.llm.registry import LLMRegistry, AgentNotFoundError
+from glados.llm.router import LLMRouter, RoutingStrategy
 
 __all__ = [
     "AgentProfile",
@@ -22,4 +23,6 @@ __all__ = [
     "BaseLLMProvider",
     "LLMRegistry",
     "AgentNotFoundError",
+    "LLMRouter",
+    "RoutingStrategy",
 ]
