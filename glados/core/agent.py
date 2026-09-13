@@ -1,4 +1,4 @@
-# ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
 Core runtime object for GLaDOS_DAEMON-SYSTEM.
@@ -16,6 +16,7 @@ from glados.skills.registry import SkillRegistry
 from glados.skills.loader import SkillLoader
 from glados.tools.registry import ToolRegistry
 from glados.tools.loader import ToolLoader
+from glados.llm.registry import LLMRegistry
 from glados.utils.logger import setup_logger
 
 
@@ -50,16 +51,26 @@ class GLaDOSAgent:
         tool_loader = ToolLoader(search_path=Path("glados/tools/builtin"))
         tool_loader.load_all(self.tools)
 
-        # 6. Build Runtime Context with all core dependencies
+        # 6. Initialize LLM Agent Registry (Phase 6)
+        self.llm_agents = LLMRegistry()
+        agent_profiles = self.config.load_agent_profiles()
+        for profile in agent_profiles:
+            try:
+                self.llm_agents.register(profile)
+            except ValueError as e:
+                self.logger.warning(f"Failed to register agent profile: {e}")
+
+        # 7. Build Runtime Context with all core dependencies
         self.ctx = RuntimeContext(
             identity=self.identity,
             logger=self.logger,
             memory=self.memory,
             skills=self.skills,
             tools=self.tools,
+            llm_agents=self.llm_agents,
         )
 
-        # 7. Initialize Brain Engine (Phase 2)
+        # 8. Initialize Brain Engine (Phase 2)
         self.brain = BrainEngine(self.ctx)
 
         self.logger.debug("GLaDOSAgent core subsystems initialized successfully.")
@@ -75,6 +86,7 @@ class GLaDOSAgent:
 
         skills_count = len(self.skills.list_all()) if self.skills else 0
         tools_count = len(self.tools.list_all()) if self.tools else 0
+        agents_count = len(self.llm_agents.list_all()) if self.llm_agents else 0
 
         print(
             f"""
@@ -102,6 +114,9 @@ Loaded Skills:
 
 Loaded Tools:
 {tools_count}
+
+Loaded LLM Agents:
+{agents_count}
 
 Status:
 ONLINE
