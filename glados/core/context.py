@@ -8,7 +8,7 @@ Provides shared state and dependencies across the application.
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from loguru import Logger
+from loguru import logger
 from glados.core.identity import Identity
 
 if TYPE_CHECKING:
@@ -17,8 +17,8 @@ if TYPE_CHECKING:
     from glados.tools.registry import ToolRegistry
     from glados.llm.registry import LLMRegistry
 
-# Standard method for typing the journal
-LoggerType = type(Logger)
+# Standard way to type-hint the loguru logger
+LoggerType = type(logger)
 
 
 @dataclass(slots=True)
