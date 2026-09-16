@@ -1,10 +1,21 @@
+# glados/llm/providers/openai.py
 # ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
 OpenAI LLM Provider implementation for GLaDOS_DAEMON-SYSTEM.
 Provides integration with OpenAI API and compatible endpoints (e.g., OpenRouter, Azure).
+
+Network hardening notes:
+- `trust_env=False` on the httpx client: the provider does not pick up
+  ambient HTTP_PROXY/HTTPS_PROXY/NO_PROXY from the process environment.
+  If you want to force traffic through a local egress proxy (squid ACL,
+  audit proxy, etc.), pass `egress_proxy` explicitly — see __init__.
+  This exists specifically against the malicious-router-in-the-middle
+  class of attack: an env var an attacker can influence should never be
+  able to silently redirect where API keys are sent.
 """
 
+import os
 from typing import Any
 
 import httpx
@@ -20,16 +31,33 @@ class OpenAIProvider(BaseLLMProvider):
     Supports GPT-4, o1, and other models via standard /v1/chat/completions endpoint.
     """
 
-    def __init__(self, timeout: float = 60.0, default_base_url: str = "https://api.openai.com/v1") -> None:
+    def __init__(
+        self,
+        timeout: float = 60.0,
+        default_base_url: str = "https://api.openai.com/v1",
+        egress_proxy: str | None = None,
+    ) -> None:
         """
         Initialize the OpenAI provider.
-        
+
         :param timeout: Default timeout for HTTP requests in seconds.
         :param default_base_url: Default API endpoint (allows overriding for OpenRouter, etc.).
+        :param egress_proxy: If set (or if GLADOS_EGRESS_PROXY is set in the
+            environment), all requests are routed through this proxy —
+            intended to point at a local audited egress point (e.g. squid
+            with a domain allowlist) rather than the open internet.
         """
         self.timeout = timeout
         self.default_base_url = default_base_url
+        self.egress_proxy = egress_proxy or os.environ.get("GLADOS_EGRESS_PROXY")
         self.logger = logger.bind(component="OpenAIProvider")
+
+    def _client(self) -> httpx.AsyncClient:
+        return httpx.AsyncClient(
+            timeout=self.timeout,
+            proxy=self.egress_proxy,
+            trust_env=False,
+        )
 
     async def complete(
         self, 
@@ -58,7 +86,7 @@ class OpenAIProvider(BaseLLMProvider):
         endpoint = f"{base_url.rstrip('/')}/chat/completions"
         
         headers = {
-            "Authorization": f"Bearer {profile.api_key}",
+            "Authorization": f"Bearer {profile.api_key.get_secret_value()}",
             "Content-Type": "application/json"
         }
         
@@ -70,7 +98,7 @@ class OpenAIProvider(BaseLLMProvider):
         )
         
         try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
+            async with self._client() as client:
                 response = await client.post(endpoint, json=payload, headers=headers)
                 response.raise_for_status()
                 
@@ -130,10 +158,12 @@ class OpenAIProvider(BaseLLMProvider):
 
         base_url = profile.base_url or self.default_base_url
         endpoint = f"{base_url.rstrip('/')}/models"
-        headers = {"Authorization": f"Bearer {profile.api_key}"}
+        headers = {"Authorization": f"Bearer {profile.api_key.get_secret_value()}"}
         
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            async with httpx.AsyncClient(
+                timeout=5.0, proxy=self.egress_proxy, trust_env=False
+            ) as client:
                 response = await client.get(endpoint, headers=headers)
                 response.raise_for_status()
                 return True
