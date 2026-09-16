@@ -1,0 +1,57 @@
+# configs/security.yaml
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
+
+# Guardian Security Policy - implements configs/identity.yaml's
+# system.guardian_enabled flag (previously declarative only).
+#
+# Philosophy: fail closed. Anything not explicitly listed here is denied.
+# Widen access deliberately, one line at a time — never by deleting a
+# whole section "to make it work".
+
+filesystem:
+  # Only these directories (and their subtrees) are reachable by
+  # ReadFileTool / WriteFileTool / ListDirectoryTool / CreateDirectoryTool /
+  # FileInfoTool. Paths are resolved (symlinks followed) before the check,
+  # so a symlink pointing outside these roots is still denied.
+  allowed_roots:
+    - "./data"
+    - "./workdir"
+
+shell:
+  allowed_binaries:
+    - git
+    - python3
+    - pytest
+    - ruff
+    - mypy
+    - uv
+  # true: ShellTool executes via shlex.split + create_subprocess_exec —
+  # no shell metacharacter interpretation at all (no ; | & && ` $() etc).
+  # Only set to false if you have a concrete need for shell pipelines AND
+  # you understand this restores injection risk for anything after the
+  # first allowlisted binary.
+  safe_mode: true
+  max_timeout_seconds: 60
+
+git:
+  allowed_subcommands:
+    - status
+    - log
+    - diff
+    - add
+    - commit
+    - branch
+    - checkout
+    # Deliberately NOT included by default: clone, push, remote, fetch, pull,
+    # config — these can exfiltrate data or reconfigure the repo. Add them
+    # explicitly (and pair with allowed_remote_domains) if you need them.
+  allowed_remote_domains:
+    - github.com
+    - raw.githubusercontent.com
+
+python_exec:
+  # Off by default. PythonExecTool has no real sandbox
+  # only flip this on if the *process this daemon runs in* is itself
+  # isolated at the OS level (throwaway container/VM), because no policy
+  # flag here can constrain arbitrary Python once it's running.
+  enabled: false
