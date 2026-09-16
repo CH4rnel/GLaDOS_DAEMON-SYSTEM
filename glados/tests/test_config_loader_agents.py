@@ -48,7 +48,7 @@ agents:
         assert profiles[0].provider == ProviderType.OLLAMA
         assert profiles[1].agent_id == "gpt4_analyst"
         assert profiles[1].provider == ProviderType.OPENAI
-        assert profiles[1].api_key == "sk-test-key-123"
+        assert profiles[1].api_key.get_secret_value() == "sk-test-key-123"
 
     def test_load_agent_profiles_with_env_substitution(self, tmp_path: Path):
         """Test that environment variables are substituted in agent profiles."""
