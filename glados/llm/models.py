@@ -1,3 +1,4 @@
+# glados/llm/models.py
 # ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
@@ -9,7 +10,7 @@ Designed to support a multi-agent ecosystem (Ollama, OpenAI, Claude, Grok, DeepS
 from enum import Enum
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 
 class ProviderType(str, Enum):
@@ -115,9 +116,15 @@ class AgentProfile(BaseModel):
         default=None, 
         description="Custom API endpoint (e.g., http://localhost:11434 for Ollama)."
     )
-    api_key: str | None = Field(
-        default=None, 
-        description="API key or token for authentication (if required)."
+    api_key: SecretStr | None = Field(
+        default=None,
+        description=(
+            "API key or token for authentication (if required). "
+            "SecretStr so it never renders in plain text via repr()/str(), "
+            "str(profile), logging of the profile object, or model_dump() "
+            "without model_dump(mode='json') + explicit unmasking. "
+            "Providers must call .get_secret_value() to use it."
+        )
     )
     
     # Behavioral configuration
