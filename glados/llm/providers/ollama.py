@@ -1,10 +1,19 @@
+# glados/llm/providers/ollama.py — full file
 # ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
 Ollama LLM Provider implementation for GLaDOS_DAEMON-SYSTEM.
 Provides integration with local Ollama API for running open-source LLMs.
+
+Network hardening: same rationale as glados/llm/providers/openai.py —
+`trust_env=False` so ambient HTTP_PROXY/HTTPS_PROXY env vars are ignored,
+with an explicit `egress_proxy` opt-in instead. Ollama is usually local
+(http://localhost:11434) so this matters less than for cloud providers,
+but if `base_url` is ever pointed at a remote Ollama instance, the same
+malicious-intermediary risk applies.
 """
 
+import os
 from typing import Any
 
 import httpx
@@ -20,14 +29,25 @@ class OllamaProvider(BaseLLMProvider):
     Supports local execution of open-source models (Llama, Qwen, Mistral, etc.).
     """
 
-    def __init__(self, timeout: float = 120.0) -> None:
+    def __init__(self, timeout: float = 120.0, egress_proxy: str | None = None) -> None:
         """
         Initialize the Ollama provider.
-        
+
         :param timeout: Default timeout for HTTP requests in seconds.
+        :param egress_proxy: If set (or GLADOS_EGRESS_PROXY env var is set),
+            requests are routed through this proxy instead of picking up
+            ambient environment proxy settings.
         """
         self.timeout = timeout
+        self.egress_proxy = egress_proxy or os.environ.get("GLADOS_EGRESS_PROXY")
         self.logger = logger.bind(component="OllamaProvider")
+
+    def _client(self) -> httpx.AsyncClient:
+        return httpx.AsyncClient(
+            timeout=self.timeout,
+            proxy=self.egress_proxy,
+            trust_env=False,
+        )
 
     async def complete(
         self, 
@@ -54,7 +74,7 @@ class OllamaProvider(BaseLLMProvider):
         )
         
         try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
+            async with self._client() as client:
                 response = await client.post(endpoint, json=payload)
                 response.raise_for_status()
                 
@@ -65,7 +85,7 @@ class OllamaProvider(BaseLLMProvider):
             error_msg = f"HTTP {e.response.status_code}: {e.response.text}"
             self.logger.error(f"Ollama API error: {error_msg}")
             return LLMResponse(
-                content=f"Error: {error_msg}",  # fix: meaningful text, empty lines
+                content=f"Error: {error_msg}",
                 model=profile.model,
                 provider=ProviderType.OLLAMA,
                 is_error=True,
@@ -78,7 +98,7 @@ class OllamaProvider(BaseLLMProvider):
             error_msg = f"Connection failed: {str(e)}"
             self.logger.error(f"Cannot connect to Ollama at {base_url}: {e}")
             return LLMResponse(
-                content=f"Error: {error_msg}",  # fix
+                content=f"Error: {error_msg}",
                 model=profile.model,
                 provider=ProviderType.OLLAMA,
                 is_error=True,
@@ -91,7 +111,7 @@ class OllamaProvider(BaseLLMProvider):
             error_msg = f"Unexpected error: {str(e)}"
             self.logger.error(f"Unexpected error in OllamaProvider: {e}", exc_info=True)
             return LLMResponse(
-                content=f"Error: {error_msg}",  # fix
+                content=f"Error: {error_msg}",
                 model=profile.model,
                 provider=ProviderType.OLLAMA,
                 is_error=True,
@@ -112,7 +132,9 @@ class OllamaProvider(BaseLLMProvider):
         endpoint = f"{base_url.rstrip('/')}/api/tags"
         
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            async with httpx.AsyncClient(
+                timeout=5.0, proxy=self.egress_proxy, trust_env=False
+            ) as client:
                 response = await client.get(endpoint)
                 response.raise_for_status()
                 return True
