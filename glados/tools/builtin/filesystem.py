@@ -1,3 +1,4 @@
+# glados/tools/builtin/filesystem.py
 # ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
 
 """
@@ -12,9 +13,12 @@ Each tool performs a single operation (SRP):
 - FileInfoTool: retrieve file/directory metadata
 
 Security:
-- Path traversal protection (resolved paths must stay within allowed roots)
+- Path traversal protection (resolved paths must stay within allowed roots),
+  enforced via the Guardian SecurityPolicy attached to RuntimeContext.
+  See glados/security/policy.py for details and for what happens when no
+  policy is attached (e.g. in unit tests).
 - Size limits for read operations
-- No recursive delete (yet) — requires explicit policy layer (Phase 7)
+- No recursive delete (yet) — requires explicit policy layer.
 """
 
 import asyncio
@@ -23,7 +27,21 @@ from pathlib import Path
 from typing import Any
 
 from glados.core.context import RuntimeContext
+from glados.security.policy import PolicyViolation, get_policy, log_missing_policy
 from glados.tools.base import BaseTool, ToolDefinition
+
+
+def _resolve_guarded(ctx: RuntimeContext, path_str: str, component: str) -> Path:
+    """
+    Resolves `path_str`, enforcing the RuntimeContext's SecurityPolicy if present.
+
+    :raises PolicyViolation: if a policy is attached and the path escapes it.
+    """
+    policy = get_policy(ctx)
+    if policy is None:
+        log_missing_policy(component)
+        return Path(path_str).resolve()
+    return policy.resolve_within_fs_roots(path_str)
 
 
 # -----------------------------------------------------------------------------
@@ -58,7 +76,7 @@ class ReadFileTool(BaseTool):
             return {"success": False, "error": "Error: empty path is not allowed."}
 
         try:
-            path = Path(path_str).resolve()
+            path = _resolve_guarded(ctx, path_str, "ReadFileTool")
 
             if not path.exists():
                 return {"success": False, "error": f"Error: path not found: {path}"}
@@ -124,7 +142,7 @@ class WriteFileTool(BaseTool):
             return {"success": False, "error": "Error: empty path is not allowed."}
 
         try:
-            path = Path(path_str).resolve()
+            path = _resolve_guarded(ctx, path_str, "WriteFileTool")
             path.parent.mkdir(parents=True, exist_ok=True)
 
             mode = "a" if append else "w"
@@ -175,7 +193,7 @@ class ListDirectoryTool(BaseTool):
             return {"success": False, "error": "Error: empty path is not allowed."}
 
         try:
-            path = Path(path_str).resolve()
+            path = _resolve_guarded(ctx, path_str, "ListDirectoryTool")
 
             if not path.exists():
                 return {"success": False, "error": f"Error: path not found: {path}"}
@@ -240,7 +258,7 @@ class CreateDirectoryTool(BaseTool):
             return {"success": False, "error": "Error: empty path is not allowed."}
 
         try:
-            path = Path(path_str).resolve()
+            path = _resolve_guarded(ctx, path_str, "CreateDirectoryTool")
 
             if path.exists() and not path.is_dir():
                 return {"success": False, "error": f"Error: path exists and is not a directory: {path}"}
@@ -287,7 +305,7 @@ class FileInfoTool(BaseTool):
             return {"success": False, "error": "Error: empty path is not allowed."}
 
         try:
-            path = Path(path_str).resolve()
+            path = _resolve_guarded(ctx, path_str, "FileInfoTool")
 
             if not path.exists():
                 return {"success": False, "error": f"Error: path not found: {path}"}
