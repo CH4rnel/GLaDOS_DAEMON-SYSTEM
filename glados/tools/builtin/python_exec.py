@@ -1,3 +1,4 @@
+# glados/tools/builtin/python_exec.py
 # ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
@@ -9,8 +10,13 @@ Security Considerations:
 - Uses asyncio.create_subprocess_exec (NO shell=True) to prevent shell injection.
 - Strict timeout limits prevent infinite loops.
 - Output truncation prevents memory exhaustion.
-- WARNING: This tool can still execute arbitrary system commands via os/system modules. 
+- WARNING: This tool can still execute arbitrary system commands via os/system modules.
   A strict AST-based sandbox or seccomp policy is required for Phase 7 (Autonomous Mode).
+- Gated by SecurityPolicy.python_exec_enabled, OFF by default. Turning this on
+  is only safe if the *process this tool runs in* is itself sandboxed at the
+  OS level (a throwaway container/VM), because no amount of policy-layer
+  checking here can constrain what arbitrary Python code does once it runs.
+  See glados/security/policy.py.
 """
 
 import asyncio
@@ -19,6 +25,7 @@ from pathlib import Path
 from typing import Any
 
 from glados.core.context import RuntimeContext
+from glados.security.policy import PolicyViolation, get_policy, log_missing_policy
 from glados.tools.base import BaseTool, ToolDefinition
 
 
@@ -72,6 +79,16 @@ class PythonExecTool(BaseTool):
 
         if not code:
             return {"success": False, "error": "Error: 'code' is required and cannot be empty."}
+
+        policy = get_policy(ctx)
+        if policy is None:
+            log_missing_policy("PythonExecTool")
+        else:
+            try:
+                policy.check_python_exec()
+            except PolicyViolation as e:
+                ctx.logger.warning(f"PythonExecTool denied by policy: {e}")
+                return {"success": False, "error": f"Error: denied by security policy: {e}"}
 
         ctx.logger.info(f"PythonExecTool: executing code snippet (timeout={timeout}s, max_output={max_output}B)")
 
