@@ -1,3 +1,4 @@
+# glados/tools/builtin/git.py
 # ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
 
 """
@@ -7,7 +8,10 @@ Provides safe, sandboxed git command execution for the GLaDOS agent.
 Security:
 - Uses asyncio.create_subprocess_exec (NOT shell=True) to prevent shell injection.
 - The executable is strictly bound to "git".
-- Working directory (cwd) is validated before execution.
+- Working directory (cwd) is validated against SecurityPolicy.allowed_fs_roots
+  before execution, and the subcommand + any remote-looking argument are
+  checked against allowed_git_subcommands / allowed_git_remote_domains.
+  See glados/security/policy.py.
 """
 
 import asyncio
@@ -15,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from glados.core.context import RuntimeContext
+from glados.security.policy import PolicyViolation, get_policy, log_missing_policy
 from glados.tools.base import BaseTool, ToolDefinition
 
 
@@ -67,7 +72,17 @@ class GitTool(BaseTool):
         if not isinstance(args, list) or len(args) == 0:
             return {"success": False, "error": "Error: 'args' must be a non-empty list of strings."}
 
-        cwd_path = Path(cwd_str).resolve()
+        policy = get_policy(ctx)
+        if policy is None:
+            log_missing_policy("GitTool")
+            cwd_path = Path(cwd_str).resolve()
+        else:
+            try:
+                cwd_path = policy.resolve_within_fs_roots(cwd_str)
+                policy.check_git_args(args)
+            except PolicyViolation as e:
+                ctx.logger.warning(f"GitTool denied by policy: {e}")
+                return {"success": False, "error": f"Error: denied by security policy: {e}"}
 
         if not cwd_path.exists() or not cwd_path.is_dir():
             return {"success": False, "error": f"Error: working directory not found: {cwd_path}"}
