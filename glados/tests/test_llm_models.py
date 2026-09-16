@@ -94,7 +94,7 @@ class TestAgentProfile:
             model="gpt-4-turbo-preview",
             api_key="sk-test-123"
         )
-        assert profile.api_key == "sk-test-123"
+        assert profile.api_key.get_secret_value() == "sk-test-123"
 
     def test_missing_required_fields(self):
         """Test that missing required fields raise ValidationError."""
