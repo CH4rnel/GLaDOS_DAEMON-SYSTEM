@@ -72,7 +72,7 @@ agents:
             profiles = loader.load_agent_profiles()
             
             assert len(profiles) == 1
-            assert profiles[0].api_key == "sk-secret-from-env"
+            assert profiles[0].api_key.get_secret_value() == "sk-secret-from-env"
             assert profiles[0].base_url == "https://custom.api.com/v1"
 
     def test_load_agent_profiles_missing_env_var_raises_error(self, tmp_path: Path):
