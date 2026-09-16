@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from glados.tools.registry import ToolRegistry
     from glados.llm.registry import LLMRegistry
     from glados.llm.router import LLMRouter
+    from glados.security.policy import SecurityPolicy
 
 # Standard method for typing the journal
 LoggerType = type(logger)
@@ -35,3 +36,4 @@ class RuntimeContext:
     tools: "ToolRegistry" = field(default=None)  # type: ignore
     llm_agents: "LLMRegistry" = field(default=None)  # type: ignore
     llm_router: "LLMRouter" = field(default=None)  # type: ignore
+    security: "SecurityPolicy" = field(default=None)  # type: ignore
