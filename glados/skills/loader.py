@@ -1,3 +1,4 @@
+# glados/skills/loader.py
 # ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
@@ -90,7 +91,7 @@ class SkillLoader:
                         registry.register(skill_instance)
                         registered_count += 1
                         
-                        self.logger.debug(f"Registered skill: {skill_instance.name} from {module_name}")
+                        self.logger.debug(f"Registered skill: {skill_instance.definition.name} from {module_name}")
                     except Exception as e:
                         self.logger.error(f"Failed to register skill {name} from {module_name}: {e}")
             
