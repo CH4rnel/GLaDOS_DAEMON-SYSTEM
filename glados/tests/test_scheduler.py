@@ -1,65 +1,101 @@
 # ♃ ☿ 𓂀  OMNISSIAH CODE LAYER 𓂀  ☿ ♃
 
 import pytest
-from datetime import datetime, timedelta
+import asyncio
+from datetime import datetime, timedelta, timezone
+from unittest.mock import MagicMock, AsyncMock
 
-# Importing what we implement (TDD Red/Green)
-from glados.core.scheduler import Scheduler, ScheduledTask
+from glados.core.context import RuntimeContext
+from glados.autonomous.scheduler import Scheduler, ScheduledTask
 
-def dummy_callback() -> None:
-    pass
-
-@pytest.fixture
-def scheduler() -> Scheduler:
-    return Scheduler()
-
-@pytest.fixture
-def sample_task() -> ScheduledTask:
-    # Task performed every minute
-    return ScheduledTask(
-        id="task_001",
-        name="System Health Check",
-        cron_expression="* * * * *",
-        callback=dummy_callback
-    )
 
 class TestScheduler:
-    def test_register_task_successfully(self, scheduler: Scheduler, sample_task: ScheduledTask) -> None:
-        scheduler.register(sample_task)
-        tasks = scheduler.get_tasks()
-        assert len(tasks) == 1
-        assert tasks[0].id == "task_001"
+    def setup_method(self) -> None:
+        self.ctx = MagicMock(spec=RuntimeContext)
+        self.scheduler = Scheduler(ctx=self.ctx)
 
-    def test_register_duplicate_task_raises_error(self, scheduler: Scheduler, sample_task: ScheduledTask) -> None:
-        scheduler.register(sample_task)
+    def test_register_task_successfully(self) -> None:
+        task = ScheduledTask(
+            id="task_001",
+            name="Test Task",
+            cron_expression="* * * * *",
+            callback=MagicMock()
+        )
+        self.scheduler.register_task(task)
+        assert "task_001" in self.scheduler._tasks
+
+    def test_register_duplicate_task_raises_error(self) -> None:
+        task = ScheduledTask(
+            id="task_001",
+            name="Test Task",
+            cron_expression="* * * * *",
+            callback=MagicMock()
+        )
+        self.scheduler.register_task(task)
         with pytest.raises(ValueError, match="already registered"):
-            scheduler.register(sample_task)
+            self.scheduler.register_task(task)
 
-    def test_next_run_is_calculated_on_init(self, sample_task: ScheduledTask) -> None:
-        # The next launch is scheduled for the future.
-        assert sample_task.next_run > datetime.now()
+    @pytest.mark.asyncio
+    async def test_check_and_run_due_tasks_executes_callback(self) -> None:
+        mock_callback = AsyncMock()
+        task = ScheduledTask(
+            id="task_002",
+            name="Due Task",
+            cron_expression="* * * * *",
+            callback=mock_callback
+        )
+        task.next_run = datetime.now(timezone.utc) - timedelta(seconds=10)
+        self.scheduler.register_task(task)
 
-    def test_get_due_tasks_returns_empty_when_not_due(self, scheduler: Scheduler, sample_task: ScheduledTask) -> None:
-        scheduler.register(sample_task)
-        # Since next_run is in the future, no task should be ready for execution right now.
-        due = scheduler.get_due_tasks()
-        assert len(due) == 0
+        await self.scheduler.check_and_run_due_tasks()
 
-    def test_get_due_tasks_returns_task_when_due(self, scheduler: Scheduler, sample_task: ScheduledTask) -> None:
-        scheduler.register(sample_task)
-        # We artificially shift the time of the next execution to the past to test the trigger.
-        sample_task.next_run = datetime.now() - timedelta(seconds=10)
-        
-        due = scheduler.get_due_tasks()
-        assert len(due) == 1
-        assert due[0].id == "task_001"
+        mock_callback.assert_called_once()
+        assert task.next_run > datetime.now(timezone.utc)
 
-    def test_mark_executed_updates_next_run(self, scheduler: Scheduler, sample_task: ScheduledTask) -> None:
-        scheduler.register(sample_task)
-        old_next_run = sample_task.next_run
-        
-        # Simulating task execution
-        scheduler.mark_executed("task_001")
-        
-        # The next launch time must be updated to a value greater than the previous one.
-        assert sample_task.next_run > old_next_run
+    @pytest.mark.asyncio
+    async def test_check_and_run_due_tasks_ignores_future_tasks(self) -> None:
+        mock_callback = AsyncMock()
+        task = ScheduledTask(
+            id="task_003",
+            name="Future Task",
+            cron_expression="0 0 * * *",
+            callback=mock_callback
+        )
+        task.next_run = datetime.now(timezone.utc) + timedelta(days=1)
+        self.scheduler.register_task(task)
+
+        await self.scheduler.check_and_run_due_tasks()
+
+        mock_callback.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_check_and_run_due_tasks_isolates_exceptions(self) -> None:
+        def failing_callback() -> None:
+            raise RuntimeError("Simulated failure")
+
+        successful_callback = AsyncMock()
+
+        failing_task = ScheduledTask(
+            id="task_fail",
+            name="Failing Task",
+            cron_expression="* * * * *",
+            callback=failing_callback
+        )
+        failing_task.next_run = datetime.now(timezone.utc) - timedelta(seconds=10)
+
+        success_task = ScheduledTask(
+            id="task_success",
+            name="Successful Task",
+            cron_expression="* * * * *",
+            callback=successful_callback
+        )
+        success_task.next_run = datetime.now(timezone.utc) - timedelta(seconds=10)
+
+        self.scheduler.register_task(failing_task)
+        self.scheduler.register_task(success_task)
+
+        await self.scheduler.check_and_run_due_tasks()
+
+        successful_callback.assert_called_once()
+        assert failing_task.next_run > datetime.now(timezone.utc)
+        assert success_task.next_run > datetime.now(timezone.utc)
