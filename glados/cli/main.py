@@ -274,6 +274,7 @@ def daemon(
     from glados.autonomous.scheduler import Scheduler
     from glados.autonomous.events import EventHandler
     from glados.autonomous.tasks.registration import create_default_tasks
+    from glados.autonomous.listeners.system_listeners import create_system_boot_listener
     from glados.core.event import Event, EventPriority
     
     try:
@@ -290,6 +291,11 @@ def daemon(
             scheduler.register_task(task)
             console.print(f"[green]Registered task:[/green] {task.name} ({task.cron_expression})")
         
+        # Subscribe system listeners before publishing events
+        boot_listener = create_system_boot_listener(agent.ctx)
+        event_handler.subscribe("system.boot", boot_listener)
+        console.print("[green]Subscribed listener:[/green] system.boot")
+
         # Publish system boot event
         boot_event = Event(type="system.boot", priority=EventPriority.CRITICAL, payload={"status": "online"})
         event_handler.publish(boot_event)
