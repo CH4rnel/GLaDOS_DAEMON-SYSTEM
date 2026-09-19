@@ -197,7 +197,7 @@ def memory(
         ))
         
         if stm_context:
-            for i, record in enumerate(stm_context[-5:], 1):  # Last 5 records
+            for i, record in enumerate(stm_context[-5:], 1):
                 console.print(f"  {i}. [{record.role}] {record.content[:100]}...")
         
         # Display long-term memory search results
@@ -208,7 +208,7 @@ def memory(
             
             if ltm_results:
                 console.print(f"Found {len(ltm_results)} matching records:")
-                for i, record in enumerate(ltm_results[:10], 1):  # First 10 results
+                for i, record in enumerate(ltm_results[:10], 1):
                     console.print(f"  {i}. [{record.role}] {record.content[:100]}...")
             else:
                 console.print("[yellow]No matching records found.[/yellow]")
@@ -257,6 +257,7 @@ def logs(
         console.print(f"[bold red]Error:[/bold red] {e}")
         raise typer.Exit(code=1)
 
+
 @app.command()
 def daemon(
     interval: int = typer.Option(
@@ -272,6 +273,8 @@ def daemon(
     from glados.autonomous.loop import AutonomousLoop
     from glados.autonomous.scheduler import Scheduler
     from glados.autonomous.events import EventHandler
+    from glados.autonomous.tasks.registration import create_default_tasks
+    from glados.core.event import Event, EventPriority
     
     try:
         agent = GLaDOSAgent()
@@ -280,6 +283,17 @@ def daemon(
         # Initialize autonomous components with runtime context
         scheduler = Scheduler(ctx=agent.ctx)
         event_handler = EventHandler(ctx=agent.ctx)
+        
+        # Register default background tasks
+        default_tasks = create_default_tasks(agent.ctx)
+        for task in default_tasks:
+            scheduler.register_task(task)
+            console.print(f"[green]Registered task:[/green] {task.name} ({task.cron_expression})")
+        
+        # Publish system boot event
+        boot_event = Event(type="system.boot", priority=EventPriority.CRITICAL, payload={"status": "online"})
+        event_handler.publish(boot_event)
+        console.print("[green]Published event:[/green] system.boot")
         
         loop = AutonomousLoop(
             ctx=agent.ctx,
@@ -299,5 +313,7 @@ def daemon(
     except Exception as e:
         console.print(f"[bold red]Fatal daemon error:[/bold red] {e}")
         raise typer.Exit(code=1)
+
+
 if __name__ == "__main__":
     app()
