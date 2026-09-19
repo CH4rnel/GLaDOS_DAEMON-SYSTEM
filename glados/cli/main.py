@@ -257,6 +257,47 @@ def logs(
         console.print(f"[bold red]Error:[/bold red] {e}")
         raise typer.Exit(code=1)
 
-
+@app.command()
+def daemon(
+    interval: int = typer.Option(
+        60, 
+        "--interval", "-i", 
+        help="Loop interval in seconds between iterations"
+    )
+) -> None:
+    """
+    Run GLaDOS as a continuous background autonomous daemon.
+    """
+    import asyncio
+    from glados.autonomous.loop import AutonomousLoop
+    from glados.autonomous.scheduler import Scheduler
+    from glados.autonomous.events import EventHandler
+    
+    try:
+        agent = GLaDOSAgent()
+        console.print("[bold cyan]Initializing autonomous subsystems...[/bold cyan]")
+        
+        # Initialize autonomous components with runtime context
+        scheduler = Scheduler(ctx=agent.ctx)
+        event_handler = EventHandler(ctx=agent.ctx)
+        
+        loop = AutonomousLoop(
+            ctx=agent.ctx,
+            scheduler=scheduler,
+            event_handler=event_handler,
+            interval_seconds=interval
+        )
+        
+        console.print(f"[bold green]Daemon started with interval: {interval}s[/bold green]")
+        console.print("[yellow]Press Ctrl+C to initiate graceful shutdown.[/yellow]")
+        
+        # Execute the continuous async loop
+        asyncio.run(loop.run_continuous())
+        
+    except KeyboardInterrupt:
+        console.print("\n[bold yellow]Daemon shutdown initiated by operator.[/bold yellow]")
+    except Exception as e:
+        console.print(f"[bold red]Fatal daemon error:[/bold red] {e}")
+        raise typer.Exit(code=1)
 if __name__ == "__main__":
     app()
