@@ -273,7 +273,7 @@ architecture is not decoration — it is the tenets, compiled.
 
 ## XI. License & Author
 
-- **License:** MIT
+- **License:** Apache
 - **Author:** CH4rnel 𓂀CHAOSMASTER𓂀
 - **Repository:** [github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM](https://github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM)
 
