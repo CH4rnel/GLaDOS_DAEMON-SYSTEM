@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict, List
 from loguru import logger
 
 from glados.brain.models import TaskInput, ExecutionResult
+from glados.brain.planner import Planner
 
 if TYPE_CHECKING:
     from glados.core.context import RuntimeContext
@@ -15,11 +16,12 @@ if TYPE_CHECKING:
 class BrainEngine:
     """
     Central orchestration component for task processing and decision making.
-    Coordinates memory retrieval, LLM analysis, planning, and tool execution.
+    Coordinates memory retrieval, planning, LLM analysis, and tool execution.
     """
 
     def __init__(self, ctx: "RuntimeContext") -> None:
         self.ctx = ctx
+        self.planner = Planner(ctx)
         self.logger = logger.bind(component="BrainEngine")
         self.logger.info("BrainEngine initialized")
 
@@ -47,10 +49,13 @@ class BrainEngine:
                 context = self.ctx.memory.get_short_term_context()
                 self.logger.debug(f"Retrieved {len(context)} context records from memory")
             
+            # 2. Create execution plan
+            plan = await self.planner.create_plan(task_input)
+            self.logger.debug(f"Generated plan with {len(plan.steps)} step(s)")
+            
             # TODO: 
-            # 2. Analyze task with LLM using retrieved context
-            # 3. Generate execution plan
-            # 4. Execute tools via GuardianGate
+            # 3. Analyze task with LLM using retrieved context
+            # 4. Execute plan steps via GuardianGate
             # 5. Store results in memory
             
             return ExecutionResult(
@@ -59,7 +64,7 @@ class BrainEngine:
                 data={
                     "priority": task_input.priority,
                     "context": context,
-                    "context_records_count": len(context)
+                    "plan_steps_count": len(plan.steps)
                 }
             )
             
