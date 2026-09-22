@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class BrainEngine:
     """
     Central orchestration component for task processing and decision making.
-    Coordinates memory retrieval, planning, LLM analysis, and tool execution.
+    Coordinates memory retrieval, planning, and tool execution.
     """
 
     def __init__(self, ctx: "RuntimeContext") -> None:
@@ -43,28 +43,44 @@ class BrainEngine:
             )
         
         try:
-            # 1. Retrieve context from memory
             context: List[Dict[str, Any]] = []
             if self.ctx.memory:
                 context = self.ctx.memory.get_short_term_context()
                 self.logger.debug(f"Retrieved {len(context)} context records from memory")
             
-            # 2. Create execution plan
             plan = await self.planner.create_plan(task_input)
             self.logger.debug(f"Generated plan with {len(plan.steps)} step(s)")
             
-            # TODO: 
-            # 3. Analyze task with LLM using retrieved context
-            # 4. Execute plan steps via GuardianGate
-            # 5. Store results in memory
+            execution_results: List[Dict[str, Any]] = []
+            for step in plan.steps:
+                self.logger.info(f"Executing step {step.step_number}: {step.action}")
+                
+                if step.tool_name and self.ctx.tools:
+                    try:
+                        step_result = await self.ctx.tools.execute(step.tool_name, step.parameters)
+                        execution_results.append({
+                            "step": step.step_number,
+                            "tool": step.tool_name,
+                            "result": step_result
+                        })
+                    except Exception as tool_error:
+                        self.logger.error(f"Tool execution failed at step {step.step_number}: {tool_error}")
+                        execution_results.append({
+                            "step": step.step_number,
+                            "tool": step.tool_name,
+                            "error": str(tool_error)
+                        })
+                else:
+                    self.logger.debug(f"Step {step.step_number} has no tool assigned, skipping execution.")
             
             return ExecutionResult(
                 success=True,
-                message=f"Task acknowledged: {task_input.description}",
+                message=f"Task completed: {task_input.description}",
                 data={
                     "priority": task_input.priority,
-                    "context": context,
-                    "plan_steps_count": len(plan.steps)
+                    "context_records_count": len(context),
+                    "plan_steps_count": len(plan.steps),
+                    "execution_results": execution_results
                 }
             )
             
