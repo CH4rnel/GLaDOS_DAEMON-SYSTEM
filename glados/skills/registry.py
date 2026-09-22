@@ -25,9 +25,13 @@ class SkillRegistry:
 
     def register(self, skill: Any) -> None:
         """Registers a new skill. Raises ValueError if name already exists."""
+        # Support both legacy objects with .name and new BaseSkill with .definition.name
         name = getattr(skill, "name", None)
+        if not name and hasattr(skill, "definition"):
+            name = getattr(skill.definition, "name", None)
+            
         if not name:
-            raise ValueError("Skill object must have a 'name' attribute.")
+            raise ValueError("Skill object must have a 'name' attribute or definition.name.")
             
         if name in self._skills:
             raise ValueError(f"Skill '{name}' is already registered.")
