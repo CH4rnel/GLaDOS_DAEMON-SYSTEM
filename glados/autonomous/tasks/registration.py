@@ -8,12 +8,14 @@ from glados.autonomous.scheduler import ScheduledTask
 from glados.autonomous.tasks.memory_tasks import consolidate_memory
 from glados.autonomous.tasks.monitoring_tasks import monitor_system_resources
 from glados.autonomous.tasks.log_rotation_tasks import rotate_logs
+from glados.autonomous.tasks.diagnostics_tasks import run_system_diagnostics
 
 if TYPE_CHECKING:
     from glados.core.context import RuntimeContext
+    from glados.autonomous.events import EventHandler
 
 
-def create_default_tasks(ctx: "RuntimeContext") -> List[ScheduledTask]:
+def create_default_tasks(ctx: "RuntimeContext", event_handler: "EventHandler") -> List[ScheduledTask]:
     """
     Generates the standard set of background tasks for the autonomous daemon.
     """
@@ -55,6 +57,19 @@ def create_default_tasks(ctx: "RuntimeContext") -> List[ScheduledTask]:
             name="Log Rotation",
             cron_expression="0 * * * *",
             callback=_log_rotation_callback
+        )
+    )
+
+    # System Diagnostics Task
+    async def _diagnostics_callback() -> None:
+        await run_system_diagnostics(ctx, event_handler)
+
+    tasks.append(
+        ScheduledTask(
+            id="system_diagnostics",
+            name="System Self-Diagnostics",
+            cron_expression="*/10 * * * *",
+            callback=_diagnostics_callback
         )
     )
 
