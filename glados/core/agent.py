@@ -1,5 +1,4 @@
-# glados/core/agent.py
-# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
+# ♃ ☿ 𓂀  OMNISSIAH CODE LAYER 𓂀  ☿ ♃
 
 """
 Core runtime object for GLaDOS_DAEMON-SYSTEM.
@@ -14,17 +13,17 @@ from glados.brain.engine import BrainEngine
 from glados.config.loader import ConfigLoader
 from glados.core.context import RuntimeContext
 from glados.core.identity import Identity
-from glados.memory.manager import MemoryManager
-from glados.skills.registry import SkillRegistry
-from glados.skills.loader import SkillLoader
-from glados.tools.registry import ToolRegistry
-from glados.tools.loader import ToolLoader
-from glados.llm.registry import LLMRegistry
-from glados.llm.router import LLMRouter
 from glados.llm.models import ProviderType
 from glados.llm.providers.ollama import OllamaProvider
 from glados.llm.providers.openai import OpenAIProvider
+from glados.llm.registry import LLMRegistry
+from glados.llm.router import LLMRouter
+from glados.memory.manager import MemoryManager
 from glados.security import GuardianGate, SecurityPolicy
+from glados.skills.loader import SkillLoader
+from glados.skills.registry import SkillRegistry
+from glados.tools.loader import ToolLoader
+from glados.tools.registry import ToolRegistry
 from glados.utils.logger import setup_logger
 
 
