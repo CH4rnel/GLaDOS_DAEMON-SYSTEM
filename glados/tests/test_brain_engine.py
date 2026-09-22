@@ -1,7 +1,7 @@
 # ♃ ☿ 𓂀  OMNISSIAH CODE LAYER 𓂀  ☿ ♃
 
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, AsyncMock
 
 from glados.core.context import RuntimeContext
 from glados.brain.models import TaskInput
@@ -53,4 +53,25 @@ class TestBrainEngine:
         
         self.ctx.memory.get_short_term_context.assert_called_once()
         assert result.success is True
-        assert "context" in result.data
+        assert "context_records_count" in result.data
+
+    @pytest.mark.asyncio
+    async def test_process_task_executes_plan_steps(self) -> None:
+        mock_plan = MagicMock()
+        mock_step = MagicMock()
+        mock_step.step_number = 1
+        mock_step.action = "Get system info"
+        mock_step.tool_name = "system_info"
+        mock_step.parameters = {"detail": "cpu"}
+        mock_plan.steps = [mock_step]
+        
+        self.engine.planner.create_plan = AsyncMock(return_value=mock_plan)
+        self.ctx.tools.execute = AsyncMock(return_value={"status": "ok", "data": "CPU at 50%"})
+        
+        task_input = TaskInput(description="Check CPU", priority=2)
+        result = await self.engine.process_task(task_input)
+        
+        self.ctx.tools.execute.assert_called_once_with("system_info", {"detail": "cpu"})
+        assert result.success is True
+        assert "execution_results" in result.data
+        assert len(result.data["execution_results"]) == 1
