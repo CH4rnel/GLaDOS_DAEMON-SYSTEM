@@ -70,12 +70,13 @@ class Planner:
         self.logger = logger.bind(component="Planner")
         self.logger.info("Planner initialized")
 
-    async def create_plan(self, task_input: TaskInput) -> Plan:
+    async def create_plan(self, task_input: TaskInput, context: List[Dict[str, Any]] | None = None) -> Plan:
         """
         Creates an execution plan for the given task.
         Attempts LLM-based planning first, falls back to rule-based on failure.
         
         :param task_input: Task description and metadata
+        :param context: Optional context from memory to inform planning
         :return: Structured execution plan
         :raises ValueError: If task description is empty
         """
@@ -87,7 +88,7 @@ class Planner:
         # Attempt LLM-based planning
         if self.ctx.llm_router:
             try:
-                plan = await self._create_plan_with_llm(task_input)
+                plan = await self._create_plan_with_llm(task_input, context or [])
                 if plan and len(plan.steps) > 0:
                     self.logger.debug(f"LLM-generated plan with {len(plan.steps)} step(s)")
                     return plan
@@ -97,12 +98,8 @@ class Planner:
         # Fallback to rule-based planning
         return self._create_rule_based_plan(task_input)
 
-    async def _create_plan_with_llm(self, task_input: TaskInput) -> Plan | None:
+    async def _create_plan_with_llm(self, task_input: TaskInput, context: List[Dict[str, Any]]) -> Plan | None:
         """Attempts to generate a plan using the LLM router."""
-        context: List[Dict[str, Any]] = []
-        if self.ctx.memory:
-            context = self.ctx.memory.get_short_term_context()
-
         user_prompt = self._build_user_prompt(task_input, context)
         
         llm_response = await self.ctx.llm_router.generate(
