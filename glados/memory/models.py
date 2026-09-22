@@ -1,25 +1,16 @@
-# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
-
-
-"""
-Memory models for GLaDOS_DAEMON-SYSTEM.
-Defines the core data structures for memory records.
-"""
+# ♃ ☿ 𓂀  OMNISSIAH CODE LAYER 𓂀  ☿ ♃
 
 from datetime import datetime, timezone
-from typing import Literal
-from uuid import uuid4
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
 
 class MemoryRecord(BaseModel):
-    """Represents a single unit of memory (a thought, fact, or message)."""
-    id: str = Field(default_factory=lambda: str(uuid4()), description="Unique identifier")
-    timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc), 
-        description="Creation time"
-    )
-    role: Literal["user", "assistant", "system"] = Field(..., description="Origin of the memory")
-    content: str = Field(..., min_length=1, description="The actual content of the memory")
-    metadata: dict = Field(default_factory=dict, description="Additional contextual metadata")
+    """Represents a single memory record in the GLaDOS memory subsystem."""
+    
+    content: str
+    role: str = "system"
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    embedding: Optional[List[float]] = None
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
