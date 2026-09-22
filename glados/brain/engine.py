@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List
 
 from loguru import logger
 
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class BrainEngine:
     """
     Central orchestration component for task processing and decision making.
-    Coordinates LLM analysis, planning, and tool execution.
+    Coordinates memory retrieval, LLM analysis, planning, and tool execution.
     """
 
     def __init__(self, ctx: "RuntimeContext") -> None:
@@ -41,19 +41,26 @@ class BrainEngine:
             )
         
         try:
-            # TODO: Implement full cognitive pipeline
             # 1. Retrieve context from memory
-            # 2. Analyze task with LLM
-            # 3. Generate execution plan
-            # 4. Execute tools
-            # 5. Store results in memory
+            context: List[Dict[str, Any]] = []
+            if self.ctx.memory:
+                context = self.ctx.memory.get_short_term_context()
+                self.logger.debug(f"Retrieved {len(context)} context records from memory")
             
-            self.logger.debug("Task validation passed")
+            # TODO: 
+            # 2. Analyze task with LLM using retrieved context
+            # 3. Generate execution plan
+            # 4. Execute tools via GuardianGate
+            # 5. Store results in memory
             
             return ExecutionResult(
                 success=True,
                 message=f"Task acknowledged: {task_input.description}",
-                data={"priority": task_input.priority}
+                data={
+                    "priority": task_input.priority,
+                    "context": context,
+                    "context_records_count": len(context)
+                }
             )
             
         except Exception as e:
