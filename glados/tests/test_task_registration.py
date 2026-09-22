@@ -4,20 +4,23 @@ import pytest
 from unittest.mock import MagicMock, AsyncMock, patch
 
 from glados.core.context import RuntimeContext
+from glados.autonomous.events import EventHandler
 from glados.autonomous.tasks.registration import create_default_tasks
 
 
 class TestTaskRegistration:
+    def setup_method(self) -> None:
+        self.ctx = MagicMock(spec=RuntimeContext)
+        self.event_handler = MagicMock(spec=EventHandler)
+
     def test_create_default_tasks_returns_list(self) -> None:
-        ctx = MagicMock(spec=RuntimeContext)
-        tasks = create_default_tasks(ctx)
+        tasks = create_default_tasks(self.ctx, self.event_handler)
         
         assert isinstance(tasks, list)
-        assert len(tasks) >= 3
+        assert len(tasks) >= 4
 
     def test_memory_consolidation_task_configuration(self) -> None:
-        ctx = MagicMock(spec=RuntimeContext)
-        tasks = create_default_tasks(ctx)
+        tasks = create_default_tasks(self.ctx, self.event_handler)
         
         consolidation_task = next((t for t in tasks if t.id == "memory_consolidation"), None)
         assert consolidation_task is not None
@@ -26,20 +29,18 @@ class TestTaskRegistration:
 
     @pytest.mark.asyncio
     async def test_memory_consolidation_callback_execution(self) -> None:
-        ctx = MagicMock(spec=RuntimeContext)
-        ctx.memory = MagicMock()
-        ctx.memory.consolidate = AsyncMock()
+        self.ctx.memory = MagicMock()
+        self.ctx.memory.consolidate = AsyncMock()
         
-        tasks = create_default_tasks(ctx)
+        tasks = create_default_tasks(self.ctx, self.event_handler)
         consolidation_task = next(t for t in tasks if t.id == "memory_consolidation")
         
         await consolidation_task.callback()
         
-        ctx.memory.consolidate.assert_called_once()
+        self.ctx.memory.consolidate.assert_called_once()
 
     def test_system_monitoring_task_configuration(self) -> None:
-        ctx = MagicMock(spec=RuntimeContext)
-        tasks = create_default_tasks(ctx)
+        tasks = create_default_tasks(self.ctx, self.event_handler)
         
         monitoring_task = next((t for t in tasks if t.id == "system_monitoring"), None)
         assert monitoring_task is not None
@@ -48,11 +49,10 @@ class TestTaskRegistration:
 
     @pytest.mark.asyncio
     async def test_system_monitoring_callback_execution(self) -> None:
-        ctx = MagicMock(spec=RuntimeContext)
-        ctx.memory = MagicMock()
-        ctx.memory.add_short_term_record = MagicMock()
+        self.ctx.memory = MagicMock()
+        self.ctx.memory.add_short_term_record = MagicMock()
         
-        tasks = create_default_tasks(ctx)
+        tasks = create_default_tasks(self.ctx, self.event_handler)
         monitoring_task = next(t for t in tasks if t.id == "system_monitoring")
         
         with patch("glados.autonomous.tasks.monitoring_tasks.psutil") as mock_psutil:
@@ -62,11 +62,10 @@ class TestTaskRegistration:
             
             await monitoring_task.callback()
             
-            ctx.memory.add_short_term_record.assert_called_once()
+            self.ctx.memory.add_short_term_record.assert_called_once()
 
     def test_log_rotation_task_configuration(self) -> None:
-        ctx = MagicMock(spec=RuntimeContext)
-        tasks = create_default_tasks(ctx)
+        tasks = create_default_tasks(self.ctx, self.event_handler)
         
         rotation_task = next((t for t in tasks if t.id == "log_rotation"), None)
         assert rotation_task is not None
@@ -75,9 +74,7 @@ class TestTaskRegistration:
 
     @pytest.mark.asyncio
     async def test_log_rotation_callback_execution(self) -> None:
-        ctx = MagicMock(spec=RuntimeContext)
-        
-        tasks = create_default_tasks(ctx)
+        tasks = create_default_tasks(self.ctx, self.event_handler)
         rotation_task = next(t for t in tasks if t.id == "log_rotation")
         
         with patch("glados.autonomous.tasks.log_rotation_tasks.Path") as mock_path:
@@ -87,3 +84,25 @@ class TestTaskRegistration:
             mock_path.return_value = mock_log_file
             
             await rotation_task.callback()
+
+    def test_system_diagnostics_task_configuration(self) -> None:
+        tasks = create_default_tasks(self.ctx, self.event_handler)
+        
+        diagnostics_task = next((t for t in tasks if t.id == "system_diagnostics"), None)
+        assert diagnostics_task is not None
+        assert diagnostics_task.name == "System Self-Diagnostics"
+        assert diagnostics_task.cron_expression == "*/10 * * * *"
+
+    @pytest.mark.asyncio
+    async def test_system_diagnostics_callback_execution(self) -> None:
+        self.ctx.memory = MagicMock()
+        self.ctx.memory.add_short_term_record = MagicMock()
+        self.ctx.llm_registry = MagicMock()
+        self.ctx.tools = MagicMock()
+        
+        tasks = create_default_tasks(self.ctx, self.event_handler)
+        diagnostics_task = next(t for t in tasks if t.id == "system_diagnostics")
+        
+        await diagnostics_task.callback()
+        
+        self.ctx.memory.add_short_term_record.assert_called_once()
