@@ -3,7 +3,6 @@
 import pytest
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock
 
 from glados.skills.registry import SkillRegistry
 from glados.skills.loader import SkillLoader
@@ -27,20 +26,26 @@ class TestSkillLoader:
         assert len(self.registry.list_all()) == 0
 
     def test_load_valid_skill_module(self) -> None:
-        # Create a mock skill module file
+        # Create a mock skill module file using BaseSkill architecture
         skill_file = Path(self.temp_dir.name) / "test_skill.py"
         skill_file.write_text(
-            "name = 'test_skill'\n"
-            "description = 'A test skill'\n"
-            "def handler(): pass\n"
+            "from glados.skills.base import BaseSkill, SkillDefinition\n"
+            "from glados.core.context import RuntimeContext\n"
+            "from typing import Any\n"
+            "\n"
+            "class TestSkill(BaseSkill):\n"
+            "    @property\n"
+            "    def definition(self) -> SkillDefinition:\n"
+            "        return SkillDefinition(name='test_skill', description='A test skill', parameters={})\n"
+            "    async def execute(self, ctx: RuntimeContext, params: dict[str, Any]) -> Any:\n"
+            "        return 'executed'\n"
         )
 
         self.loader.load_all(self.registry)
 
         skills = self.registry.list_all()
         assert len(skills) == 1
-        assert skills[0].name == "test_skill"
-        assert skills[0].description == "A test skill"
+        assert skills[0].definition.name == "test_skill"
 
     def test_load_ignores_non_python_files(self) -> None:
         # Create a non-python file
@@ -51,10 +56,11 @@ class TestSkillLoader:
         assert len(self.registry.list_all()) == 0
 
     def test_load_handles_malformed_skill_gracefully(self) -> None:
-        # Create a module missing required attributes
+        # Create a module missing BaseSkill class
         bad_skill_file = Path(self.temp_dir.name) / "bad_skill.py"
         bad_skill_file.write_text(
-            "description = 'Missing name and handler'\n"
+            "name = 'bad_skill'\n"
+            "description = 'Missing BaseSkill class'\n"
         )
 
         # Should not raise an exception, just log a warning and skip
