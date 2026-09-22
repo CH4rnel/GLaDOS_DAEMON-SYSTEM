@@ -1,59 +1,79 @@
-# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
+# ♃ ☿ 𓂀  OMNISSIAH CODE LAYER 𓂀  ☿ ♃
 
-"""
-Planner subsystem for GLaDOS_DAEMON-SYSTEM.
-Responsible for breaking down high-level tasks into executable steps.
-"""
+from __future__ import annotations
 
-from glados.brain.models import TaskInput, Plan, PlanStep
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, List
+
+from loguru import logger
+
+from glados.brain.models import TaskInput
+
+if TYPE_CHECKING:
+    from glados.core.context import RuntimeContext
+
+
+@dataclass
+class PlanStep:
+    """Represents a single step in an execution plan."""
+    step_number: int
+    action: str
+    tool_name: str | None = None
+    parameters: dict = field(default_factory=dict)
+
+
+@dataclass
+class Plan:
+    """Represents a structured execution plan for a task."""
+    task_description: str
+    steps: List[PlanStep] = field(default_factory=list)
+    
+    def add_step(self, action: str, tool_name: str | None = None, parameters: dict | None = None) -> None:
+        """Adds a new step to the plan."""
+        step_number = len(self.steps) + 1
+        step = PlanStep(
+            step_number=step_number,
+            action=action,
+            tool_name=tool_name,
+            parameters=parameters or {}
+        )
+        self.steps.append(step)
 
 
 class Planner:
     """
-    Core planning engine.
-    Currently uses a deterministic mock logic. 
-    Will be replaced by LLM-based planning in Phase 6.
+    Generates structured execution plans from task descriptions.
+    Currently uses rule-based planning; will integrate with LLM for intelligent planning.
     """
 
-    def __init__(self) -> None:
-        """Initializes the Planner."""
-        pass
+    def __init__(self, ctx: "RuntimeContext") -> None:
+        self.ctx = ctx
+        self.logger = logger.bind(component="Planner")
+        self.logger.info("Planner initialized")
 
-    def create_plan(self, task: TaskInput) -> Plan:
+    async def create_plan(self, task_input: TaskInput) -> Plan:
         """
-        Generates an execution plan for a given task.
+        Creates an execution plan for the given task.
         
-        :param task: The validated input task.
-        :return: A structured Plan object.
+        :param task_input: Task description and metadata
+        :return: Structured execution plan
+        :raises ValueError: If task description is empty
         """
-        steps = self._generate_mock_steps(task)
+        if not task_input.description or not task_input.description.strip():
+            raise ValueError("Task description cannot be empty")
         
-        return Plan(
-            task_description=task.description,
-            steps=steps
+        self.logger.info(f"Creating plan for task: {task_input.description}")
+        
+        plan = Plan(task_description=task_input.description)
+        
+        # TODO: Integrate with LLM for intelligent planning
+        # For now, generate a basic single-step plan
+        plan.add_step(
+            action=f"Process task: {task_input.description}",
+            tool_name=None,
+            parameters={"priority": task_input.priority}
         )
-
-    def _generate_mock_steps(self, task: TaskInput) -> list[PlanStep]:
-        """
-        Generates deterministic mock steps for testing and bootstrapping.
         
-        :param task: The input task.
-        :return: List of mock PlanSteps.
-        """
-        return [
-            PlanStep(
-                step_id=1, 
-                action="analyze", 
-                description=f"Analyze requirements for: {task.description}"
-            ),
-            PlanStep(
-                step_id=2, 
-                action="execute", 
-                description=f"Execute core logic for: {task.description}"
-            ),
-            PlanStep(
-                step_id=3, 
-                action="verify", 
-                description="Verify execution results and report status"
-            )
-        ]
+        self.logger.debug(f"Generated plan with {len(plan.steps)} step(s)")
+        
+        return plan
