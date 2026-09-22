@@ -1,13 +1,10 @@
-# ♃ ☿ 𓂀  OMNISSIAH CONFIG LAYER 𓂀  ☿ ♃
+# ♃ ☿ 𓂀  OMNISSIAH CODE LAYER 𓂀  ☿ ♃
 
-"""
-Skill Registry for GLaDOS_DAEMON-SYSTEM.
-Acts as a central catalog for all available skills.
-"""
+from __future__ import annotations
+
+from typing import Any, Dict, List
 
 from loguru import logger
-
-from glados.skills.base import BaseSkill, SkillDefinition
 
 
 class SkillNotFoundError(Exception):
@@ -17,47 +14,39 @@ class SkillNotFoundError(Exception):
 
 class SkillRegistry:
     """
-    Central registry for managing and retrieving skills.
-    Ensures skill names are unique and provides a unified interface for the Brain.
+    Central registry for all available skills.
+    Provides registration, discovery, and retrieval of skills by name.
     """
 
     def __init__(self) -> None:
-        """Initializes the empty skill registry."""
-        self._skills: dict[str, BaseSkill] = {}
+        self._skills: Dict[str, Any] = {}
         self.logger = logger.bind(component="SkillRegistry")
-        self.logger.debug("SkillRegistry initialized.")
+        self.logger.debug("SkillRegistry initialized")
 
-    def register(self, skill: BaseSkill) -> None:
-        """
-        Registers a new skill in the registry.
-        
-        :param skill: The skill instance to register.
-        :raises ValueError: If a skill with the same name is already registered.
-        """
-        name = skill.definition.name
-        
+    def register(self, skill: Any) -> None:
+        """Registers a new skill. Raises ValueError if name already exists."""
+        name = getattr(skill, "name", None)
+        if not name:
+            raise ValueError("Skill object must have a 'name' attribute.")
+            
         if name in self._skills:
-            raise ValueError(f"Skill with name '{name}' is already registered.")
+            raise ValueError(f"Skill '{name}' is already registered.")
             
         self._skills[name] = skill
-        self.logger.info(f"Registered skill: {name}")
+        self.logger.debug(f"Registered skill: {name}")
 
-    def get(self, name: str) -> BaseSkill:
-        """
-        Retrieves a skill by its unique name.
-        
-        :param name: The name of the skill.
-        :return: The skill instance.
-        :raises SkillNotFoundError: If the skill is not registered.
-        """
+    def get(self, name: str) -> Any:
+        """Retrieves a skill by name. Raises SkillNotFoundError if not found."""
         if name not in self._skills:
             raise SkillNotFoundError(f"Skill '{name}' not found in registry.")
-            
         return self._skills[name]
 
-    def list_all(self) -> list[SkillDefinition]:
-        """
-        Returns a list of definitions for all registered skills.
-        Useful for LLM context injection or CLI listing.
-        """
-        return [skill.definition for skill in self._skills.values()]
+    def list_all(self) -> List[Any]:
+        """Returns all registered skills."""
+        return list(self._skills.values())
+
+    def unregister(self, name: str) -> None:
+        """Removes a skill from the registry."""
+        if name in self._skills:
+            del self._skills[name]
+            self.logger.debug(f"Unregistered skill: {name}")
