@@ -3,26 +3,26 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from loguru import logger
 
-
-@dataclass
-class Skill:
-    """Lightweight skill representation for dynamically loaded modules."""
-    name: str
-    description: str
-    handler: Any
+try:
+    from glados.skills.base import BaseSkill
+except ImportError:
+    # Fallback for environments where base might not be fully resolved yet
+    class BaseSkill:  # type: ignore
+        pass
 
 
 class SkillLoader:
     """
     Dynamically discovers and loads skill modules from a directory.
-    Each valid module must expose 'name', 'description', and 'handler' attributes.
+    Looks for classes inheriting from BaseSkill, instantiates them,
+    and registers the instances in the SkillRegistry.
     """
 
     def __init__(self, skills_dir: Path) -> None:
@@ -32,7 +32,7 @@ class SkillLoader:
 
     def load_all(self, registry: Any) -> int:
         """
-        Scans the skills directory and registers all valid skill modules.
+        Scans the skills directory and registers all valid skill classes.
         
         :param registry: SkillRegistry instance to populate
         :return: Number of successfully loaded skills
@@ -47,19 +47,19 @@ class SkillLoader:
                 continue
 
             try:
-                skill = self._load_module(skill_file)
-                if skill:
-                    registry.register(skill)
+                skill_instance = self._load_module(skill_file)
+                if skill_instance:
+                    registry.register(skill_instance)
                     loaded_count += 1
-                    self.logger.debug(f"Loaded skill: {skill.name} from {skill_file.name}")
+                    self.logger.debug(f"Loaded skill: {skill_instance.definition.name} from {skill_file.name}")
             except Exception as e:
                 self.logger.warning(f"Failed to load skill from {skill_file.name}: {e}")
 
         self.logger.info(f"SkillLoader completed: {loaded_count} skill(s) loaded")
         return loaded_count
 
-    def _load_module(self, skill_file: Path) -> Skill | None:
-        """Dynamically imports a single skill module and extracts its attributes."""
+    def _load_module(self, skill_file: Path) -> Any | None:
+        """Dynamically imports a single skill module and instantiates the BaseSkill class."""
         module_name = f"glados.skills.dynamic.{skill_file.stem}"
         
         spec = importlib.util.spec_from_file_location(module_name, skill_file)
@@ -76,12 +76,10 @@ class SkillLoader:
             sys.modules.pop(module_name, None)
             raise RuntimeError(f"Module execution failed: {e}") from e
 
-        name = getattr(module, "name", None)
-        description = getattr(module, "description", None)
-        handler = getattr(module, "handler", None)
-
-        if not name or not description or not handler:
-            missing = [attr for attr, val in [("name", name), ("description", description), ("handler", handler)] if not val]
-            raise ValueError(f"Missing required attributes: {missing}")
-
-        return Skill(name=name, description=description, handler=handler)
+        # Find all classes in the module that inherit from BaseSkill
+        for name, obj in inspect.getmembers(module, inspect.isclass):
+            if issubclass(obj, BaseSkill) and obj is not BaseSkill:
+                # Instantiate the skill
+                return obj()
+        
+        return None
