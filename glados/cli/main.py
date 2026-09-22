@@ -286,7 +286,7 @@ def daemon(
         event_handler = EventHandler(ctx=agent.ctx)
         
         # Register default background tasks
-        default_tasks = create_default_tasks(agent.ctx)
+        default_tasks = create_default_tasks(agent.ctx, event_handler)
         for task in default_tasks:
             scheduler.register_task(task)
             console.print(f"[green]Registered task:[/green] {task.name} ({task.cron_expression})")
