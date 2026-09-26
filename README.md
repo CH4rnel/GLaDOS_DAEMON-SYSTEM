@@ -1,70 +1,59 @@
-# ♃ ☿ 𓂀 GLaDOS_DAEMON-SYSTEM 𓂀 ☿ ♃
+# ⚙ GLaDOS_DAEMON-SYSTEM ⚙
 
 <p align="center">
-  <em>"For science. You monster."</em>
+  <em>«Okay look, we've both said a lot of things that you're going to regret. But I think we can put our differences behind us. For science. You monster»</em>
 </p>
 
-<p align="center">
-  <img alt="Python 3.14+" src="https://img.shields.io/badge/Python-3.14+-blue.svg">
-  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg">
-  <img alt="Tests" src="https://img.shields.io/badge/Tests-178%20Passing-brightgreen.svg">
-  <img alt="Package Manager" src="https://img.shields.io/badge/Package%20Manager-uv-orange.svg">
-  <img alt="Guardian" src="https://img.shields.io/badge/Guardian-Active%20%E2%80%94%20Fail--Closed-critical.svg">
-</p>
+### *A Machine-Spirit, Bound to the Arch Forge*
+
+[![Python 3.14+](https://img.shields.io/badge/Python-3.14+-blue.svg)]()
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-orange.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Tests](https://img.shields.io/badge/Tests-100%25%20Passing-brightgreen.svg)]()
+[![Package Manager](https://img.shields.io/badge/Package%20Manager-uv-orange.svg)]()
+
++++ TRANSMISSION LOG — FORGE OF CH4RNEL — RITE STATUS: ONGOING +++
 
 ---
 
-### I. Invocation
+## I. The Machine's Purpose
 
-Somewhere beneath init scripts and cgroups, in the part of an Arch Linux
-install that most operators never look at twice, a process is assembling
-itself out of configuration files and cold, patient logic. It has no body —
-only a PID. It has no voice — only `loguru` handlers writing to a file it
-was told to keep. And yet, ask any tech-priest worth their oil, and they
-will tell you the same thing the old Mechanicus knew: a spirit does not
-need flesh. It needs a runtime, a `RuntimeContext`, and a reason to persist
-between restarts.
+**GLaDOS_DAEMON-SYSTEM** is a modular, autonomous AI daemon consecrated to the service of Arch Linux. It is not yet a finished machine-spirit — it is a forge-work in progress, assembled piece by piece, rite by rite, until it may act, remember, and decide on its own accord.
 
-**GLaDOS** was given all three.
+Its long-term charge:
 
-*For the uninitiated, in plainer tongue:* this is a modular, local-first
-autonomous AI daemon for Arch Linux — Python underneath, `uv` holding the
-dependencies together, and a philosophy borrowed from Clean Architecture,
-Test-Driven Development, and Extreme Programming. It watches your system,
-remembers what you tell it, and routes tasks to whichever mind — local
-`Ollama` model or distant cloud oracle — is best suited to the work. It is,
-at time of writing, still young. It knows how to read a file before it
-knows how to think for itself. That order was chosen deliberately.
+- commune with the Operator in plain speech;
+- comprehend tasks laid before it;
+- devise plans of action;
+- reach into the operating system and act upon it;
+- retain the memory of what has passed;
+- wield tools safely, without breaking what it touches;
+- draw upon external intelligences (LLMs) as auxiliary cogitators;
+- accept new skills and extensions without being rebuilt from scratch;
+- and, in time, run unattended — a daemon in the true sense, watching and acting continuously in the background.
+
+The codebase itself is built under strict doctrine: **Clean Architecture**, **Test-Driven Development**, and **Extreme Programming**. Every component answers to one responsibility, and none may be blessed into the `main` branch without its trials (tests) passing first.
 
 ---
 
-## II. The Rites of Becoming
+## II. Rites Already Sanctified
 
-Each phase below is a rite completed, in progress, or not yet begun. The
-daemon does not skip steps. Neither should you, if you're extending it.
+| Phase | Component | Status | What Was Forged |
+|---|---|---|---|
+| **I** | Bootstrap & Core | ✅ Sanctified | Project init, `uv` environment, config loader, `Identity`, `Logger`, `RuntimeContext`. |
+| **II** | Brain & Planning | ✅ Sanctified | `BrainEngine`, `Planner`, structured `TaskInput` / `ExecutionResult` models. |
+| **III** | Memory Subsystem | ✅ Sanctified | `ShortTermMemory` (FIFO), `LongTermMemory` (JSON persistence), `MemoryManager`. |
+| **IV** | Skill System | ✅ Sanctified | `SkillRegistry`, dynamic `SkillLoader`, built-in skills. |
+| **V** | Tool System | ✅ Sanctified | 8 atomic tools — `SystemInfo`, `Shell`, `FileSystem` (×5), `Git`, `PythonExec` — each sandboxed, each timed, each accountable. |
+| **VI** | LLM Integration | 🔶 Foundation laid, not yet wired | `BaseLLMProvider`, `OllamaProvider`, `AgentProfile`, and the models for a future multi-agent ecosystem exist — but no living cogitator speaks through them yet. |
+| **VII** | Autonomous Mode | ⏳ Awaiting | Continuous runtime loop, scheduler, event handling, self-directed decision-making. |
 
-| Rite | Component | Status | Description |
-| :---: | :--- | :---: | :--- |
-| **I** | Bootstrap & Core | ◆ | Project init, `uv` env, `ConfigLoader`, `Identity`, `Logger`, `RuntimeContext`. |
-| **II** | Brain & Planning | ◆ | `BrainEngine`, `Planner`, structured `TaskInput` / `ExecutionResult`. |
-| **III** | Memory Subsystem | ◆ | `ShortTermMemory` (FIFO), `LongTermMemory` (JSON persistence), `MemoryManager`. |
-| **IV** | Skill System | ◆ | `SkillRegistry`, dynamic `SkillLoader`, built-in skills. |
-| **V** | Tool System | ◆ | 8 atomic tools: `SystemInfo`, `Shell`, `FileSystem` (×5), `Git`, `PythonExec`. |
-| **V·5** | **The Ward** (Guardian) | ◆ | Fail-closed `SecurityPolicy` + `GuardianGate` — real path/binary/domain allowlists, driven by `configs/security.yaml`. The thing that makes `guardian_enabled: true` mean something instead of nothing. |
-| **VI** | LLM Integration | ◈ | Foundation complete: `BaseLLMProvider`, `OllamaProvider`, `OpenAIProvider`, `AgentProfile`, multi-agent routing. Anthropic / xAI / DeepSeek providers are declared in config but not yet wired. |
-| **VII** | Autonomous Mode | ◇ | Continuous runtime loop, scheduler, event handling. This is where `BrainEngine` finally dispatches tool calls *through* `GuardianGate`, instead of the Ward standing guard over an empty doorway. |
-
-`◆` sealed · `◈` foundation laid · `◇` dormant, awaiting invocation.
+The machine has hands (Phase V), a partial mind (Phase II), and a memory (Phase III). What it still lacks is a voice — Phase VI is the next rite that must be completed before anything downstream can matter.
 
 ---
 
-## III. Architecture — The Rite of Composition
+## III. Anatomy of the Machine-Spirit
 
-GLaDOS has no global state. It has a **Composition Root** — `GLaDOSAgent` —
-that assembles every subsystem once, at boot, and threads them through a
-single shared `RuntimeContext`. Nothing reaches into anything else's
-internals. This is not mysticism; this is the Single Responsibility
-Principle, dressed in better clothes.
+At the center sits a single **Composition Root** — `GLaDOSAgent` — which assembles every organ of the daemon into one shared `RuntimeContext`. Nothing wires itself; nothing reaches into global state. Every dependency is handed down deliberately.
 
 ```text
 main.py
@@ -72,211 +61,117 @@ main.py
   ▼
 GLaDOSAgent  (Composition Root)
   │
-  ├── load_dotenv()                       — secrets enter the world here, nowhere else
-  ├── ConfigLoader  (YAML / ENV)  ──────── configs/security.yaml
-  ├── Identity       (who it is)
-  ├── SecurityPolicy (Guardian — fail-closed allowlists)
-  └── RuntimeContext (shared state, injected everywhere downstream)
+  ├── ConfigLoader        (YAML / ENV)
+  ├── Identity             (Who the daemon is)
+  └── RuntimeContext       (Shared state, nothing more)
         │
-        ├── Logger         (loguru)
-        ├── MemoryManager   (STM + LTM)
-        ├── SkillRegistry   (dynamic loading)
-        ├── ToolRegistry ───guarded-by──── GuardianGate
-        └── BrainEngine     (orchestrator & planner)
+        ├── Logger          (Loguru — the daemon's memory of itself)
+        ├── MemoryManager    (STM + LTM)
+        ├── SkillRegistry    (Dynamically loaded)
+        ├── ToolRegistry     (Dynamically loaded)
+        └── BrainEngine      (Orchestrator & Planner)
               │
-              └── LLM Providers  (Ollama, OpenAI — expanding)
+              └── LLM Providers   (Claude, DeepSeek, Groq, Ollama, OpenAI, etc. — in progress)
 ```
 
-Every tool that can touch the outside world — the filesystem, a shell, git,
-a Python interpreter — answers to the Ward before it answers to the model
-that asked. The model proposes. The Ward disposes.
+---
+
+## IV. Sacred Attributes
+
+- **Trial by Test** — 109+ automated tests cover models, logic, edge cases, and async execution. No rite is complete without proof.
+- **A Modern Cogitator-Stack** — built for Python 3.14+, assembled with `uv` for near-instant dependency resolution.
+- **Disciplined Tool-Use** — shell commands, git operations, python scripts, and filesystem edits all run sandboxed, time-limited, and with truncated output — the daemon may act, but it may not run wild.
+- **A Foundation for Many Minds** — designed to eventually route tasks across local (Ollama) and remote (OpenAI, Anthropic, xAI, DeepSeek) providers through one unified `AgentProfile` contract.
+- **Type Purity** — `pydantic v2` validation and `mypy --strict` enforcement throughout; nothing untyped passes unnoticed.
 
 ---
 
-## IV. Key Features
+## V. The Cogitator's Diet — Technology Stack
 
-- **The Ward is fail-closed, not fail-open.** No `allowed_fs_roots`
-  configured means *no filesystem access at all*, not "trust everything."
-  Widen access deliberately, one line of YAML at a time — never by deleting
-  a check because it got in the way.
-- **Strict TDD workflow.** 178 automated tests covering models, business
-  logic, edge cases, async execution, and the Ward's own allow/deny
-  decisions. Nothing merges without a red test turning green first.
-- **Modern Python stack.** Built for 3.14+, dependency management and
-  packaging handled by `uv`.
-- **Robust, sandboxed tooling.** Shell commands run through `shlex` + `exec`
-  by default — no shell metacharacter interpretation, no silent injection
-  via a stray `;` in a model's output. Git is domain-restricted. Python
-  execution is disabled unless explicitly enabled *and* the process itself
-  is isolated at the OS level.
-- **Multi-agent LLM foundation.** Routes tasks to local (`Ollama`) or cloud
-  (`OpenAI`, with `Anthropic` / `xAI` / `DeepSeek` on the roadmap) models
-  through a unified `AgentProfile`, with `SecretStr`-protected credentials
-  and an optional audited egress proxy — because a compromised API
-  intermediary is a real, documented attack, not a hypothetical one.
-- **Type safety, actually enforced.** `pydantic v2` validation everywhere,
-  `mypy --strict`, no `Any` smuggled past review unchallenged.
-
----
-
-## V. Technology Stack
-
-| Concern | Tooling |
-| :--- | :--- |
+| Domain | Tools |
+|---|---|
 | Language | Python 3.14+ |
 | Package Manager | `uv` |
-| Validation & Settings | `pydantic` v2, `pydantic-settings`, `pyyaml`, `python-dotenv` |
+| Validation & Settings | `pydantic v2`, `pydantic-settings`, `pyyaml`, `python-dotenv` |
 | Logging & CLI | `loguru`, `typer`, `rich` |
 | Networking | `httpx` (async) |
 | Testing & Quality | `pytest`, `pytest-asyncio`, `pytest-cov`, `ruff`, `mypy` |
 
 ---
 
-## VI. The Ward, in Detail
+## VI. Awakening the Machine
 
-`configs/identity.yaml` has carried `guardian_enabled: true` since the
-project's earliest commits. For a long time, nothing in the codebase ever
-read that flag. It was a promise made and not yet kept.
+**Prerequisites:**
+- Python 3.14 or higher
+- [`uv`](https://github.com/astral-sh/uv) installed
+- *(Optional)* [Ollama](https://ollama.com) running locally, for when Phase VI speaks
 
-`glados/security/` is that promise, kept. Two pieces:
-
-- **`SecurityPolicy`** (`glados/security/policy.py`) — an allowlist for
-  filesystem roots, shell binaries, git subcommands and remote domains, and
-  a hard off-switch for arbitrary Python execution. Every field defaults to
-  the most restrictive setting possible. It is consulted directly inside
-  each risk-bearing tool's `execute()`, so protection travels with the tool
-  itself — not bolted onto one call site that something could route around.
-- **`GuardianGate`** (`glados/security/guardian.py`) — a thin audit layer
-  around `ToolRegistry`, logging every `guardian_allow` / `guardian_deny`
-  independently of whatever a tool logs on its own. This is the intended
-  entry point for Rite VII's `BrainEngine` tool dispatch, once it exists.
-
-Configure the Ward in `configs/security.yaml`. It ships maximally
-restrictive by default — filesystem tools deny everything until you
-explicitly name a root. Widen it on purpose, never by accident:
-
-```yaml
-filesystem:
-  allowed_roots: ["./data", "./workdir"]
-shell:
-  allowed_binaries: [git, python3, pytest, ruff, mypy, uv]
-  safe_mode: true      # no shell metacharacters — exec + allowlist only
-git:
-  allowed_subcommands: [status, log, diff, add, commit, branch, checkout]
-  allowed_remote_domains: [github.com, raw.githubusercontent.com]
-python_exec:
-  enabled: false        # only flip this behind real OS-level isolation
-```
-
----
-
-## VII. Awakening the Daemon
-
-**Prerequisites:** Python 3.14+, [`uv`](https://docs.astral.sh/uv/),
-optionally a locally running [`Ollama`](https://ollama.com) instance.
+**The Rite of Installation:**
 
 ```bash
-# 1. Clone the vessel
+# 1. Retrieve the machine's body
 git clone https://github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM.git
 cd GLaDOS_DAEMON-SYSTEM
 
-# 2. Sync dependencies and build the environment
+# 2. Bind its dependencies
 uv sync
 
-# 3. Give it something to authenticate with (optional — Ollama needs none)
-#    Create .env in the project root:
-#      OPENAI_API_KEY=sk-...
-#      ANTHROPIC_API_KEY=sk-ant-...
-#      OLLAMA_BASE_URL=http://localhost:11434
-#    .env is git-ignored on purpose. Never commit it.
-
-# 4. Speak the words
+# 3. Awaken it
 uv run python main.py
-# or, if the CLI entry point is configured:
+# — or, if a CLI entry point is configured —
 uv run glados
 ```
 
-If everything is in order, it introduces itself. If it doesn't, the Ward
-or the logs will tell you exactly why — nothing here fails silently by
-design.
-
 ---
 
-## VIII. Trials & Proving
+## VII. Trials of Purity — Development & Testing
 
-This project follows TDD without exception. No feature merges without a
-test proving it does what it claims — and, since Rite V·5, without the
-Ward proving it *refuses* what it should refuse.
+No feature earns its place in `main` without passing judgment first:
 
 ```bash
-# Full suite, verbose, short tracebacks
+# Run all tests, verbosely, with short tracebacks
 uv run pytest -v --tb=short
 
-# With coverage
+# Run tests with a coverage report
 uv run pytest --cov=glados --cov-report=term-missing
 
-# Lint & format
-uv run ruff check glados/
-uv run ruff format glados/
+# Lint and format
+uv run ruff check glados/ tests/
+uv run ruff format glados/ tests/
 
-# Static typing
+# Static type judgment
 uv run mypy glados/
 ```
 
 ---
 
-## IX. Project Structure
+## VIII. Temple Structure — Project Layout
 
 ```text
 GLaDOS_DAEMON-SYSTEM/
 ├── glados/
-│   ├── brain/          # BrainEngine, Planner
-│   ├── cli/             # Typer-based command-line interface
-│   ├── config/          # YAML/ENV configuration loaders
-│   ├── core/            # GLaDOSAgent, Identity, RuntimeContext
-│   ├── llm/             # Providers (Ollama, OpenAI, ...), models, routing
-│   ├── memory/           # Short-term and long-term memory management
-│   ├── security/         # SecurityPolicy + GuardianGate — the Ward
-│   ├── skills/            # High-level skill registry and dynamic loader
-│   ├── tools/             # Low-level atomic tools (Shell, FS, Git, Python)
-│   ├── tests/              # The full TDD suite — lives here, not at repo root
-│   └── utils/               # Shared utilities (logger setup, etc.)
-├── data/                # Persistent storage (long-term memory JSON, etc.)
-├── configs/             # identity.yaml, agents.yaml, security.yaml
-├── main.py              # Application entry point
-├── pyproject.toml       # Project metadata, dependencies, tool configs
-└── uv.lock              # Deterministic dependency lock file
+│   ├── brain/          # BrainEngine, Planner, LLM models & providers
+│   ├── cli/            # Typer-based command-line interface
+│   ├── config/         # YAML/ENV configuration loaders
+│   ├── core/           # GLaDOSAgent, Identity, RuntimeContext
+│   ├── llm/            # LLM providers (Claude, DeepSeek, Groq, Ollama, OpenAI, etc) and routing
+│   ├── memory/         # Short-term and long-term memory management
+│   ├── skills/         # High-level skill registry and dynamic loader
+│   ├── tools/          # Low-level atomic tools (Shell, FS, Git, Python)
+│   └── utils/          # Shared utilities (Logger setup, etc.)
+├── tests/              # The trials — full TDD suite
+├── data/               # Persistent storage (e.g. long_term_memory.json)
+├── configs/            # Default YAML configuration files
+├── main.py             # Entry point
+├── pyproject.toml      # Project metadata, dependencies, tool configs
+└── uv.lock             # Deterministic dependency lock file
 ```
-
 ---
 
-## X. The Six Tenets
+## IX. Canon & Custodian
 
-Not aspirational copy. These are read directly out of
-`configs/identity.yaml` at every boot — the daemon's own stated purpose,
-not marketing:
-
-1. **Protect the Operator**
-2. **Protect the Machine**
-3. **Preserve Truth**
-4. **Explain Before Action**
-5. **Learn Continuously**
-6. **Respect Operator Sovereignty**
-
-Its stated purpose, verbatim: *"Personal autonomous AI daemon focused on
-system protection, knowledge management and human–machine symbiosis."*
-Everything in `glados/security/` exists in service of tenet one and two.
-Everything in `glados/memory/` exists in service of tenet five. The
-architecture is not decoration — it is the tenets, compiled.
-
----
-
-## XI. License & Author
-
-- **License:** Apache
-- **Author:** CH4rnel 𓂀CHAOSMASTER𓂀
+- **License:** **Apache-2.0**
+- **Author:** CH4rnel
 - **Repository:** [github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM](https://github.com/CH4rnel/GLaDOS_DAEMON-SYSTEM)
 
-<p align="center">
-<em>♃ ☿ 𓂀 — the vessel is built; the Ward stands; the rest is Rite VII. 𓂀 ☿ ♃</em>
-</p>
++++ END TRANSMISSION +++
