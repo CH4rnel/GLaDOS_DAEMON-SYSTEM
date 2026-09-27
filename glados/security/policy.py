@@ -127,6 +127,19 @@ class SecurityPolicy:
                 "isolation (separate container/VM), not as a library-level toggle"
             )
 
+    def check_mcp_tool(self, server_name: str, tool_name: str) -> None:
+        """
+        Verifies if a specific MCP tool on a specific server is allowed.
+        Fail-closed: if not explicitly in the allowlist, it is denied.
+        """
+        # Example allowlist structure in policy config:
+        # allowed_mcp_tools: {"filesystem": ["read_file", "list_directory"]}
+        allowed = self.config.get("allowed_mcp_tools", {}).get(server_name, [])
+        
+        if tool_name not in allowed:
+            raise PolicyViolation(
+                f"MCP tool '{tool_name}' on server '{server_name}' is not in the security allowlist."
+            )
 
 def get_policy(ctx: Any) -> SecurityPolicy | None:
     """
