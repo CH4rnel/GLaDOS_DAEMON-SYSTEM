@@ -1,0 +1,604 @@
+{
+  "version": "1.0.0",
+  "description": "Auto-generated index of all vendored AI skills",
+  "providers": {
+    "bolt": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "Bolt",
+          "path": "bolt/Bolt.txt",
+          "type": "prompt",
+          "size_bytes": 16190
+        }
+      ]
+    },
+    "brave": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "LEO_Aug-31-2025",
+          "path": "brave/LEO_Aug-31-2025",
+          "type": "other",
+          "size_bytes": 2971
+        }
+      ]
+    },
+    "claude": {
+      "skill_count": 15,
+      "skills": [
+        {
+          "name": "CLAUDE-FABLE-5",
+          "path": "claude/CLAUDE-FABLE-5.md",
+          "type": "prompt",
+          "size_bytes": 122750
+        },
+        {
+          "name": "CLAUDE-OPUS-5.5",
+          "path": "claude/CLAUDE-OPUS-5.5.md",
+          "type": "prompt",
+          "size_bytes": 1953216
+        },
+        {
+          "name": "Claude-4.1",
+          "path": "claude/Claude-4.1.txt",
+          "type": "prompt",
+          "size_bytes": 58212
+        },
+        {
+          "name": "Claude-4.5-Opus",
+          "path": "claude/Claude-4.5-Opus.txt",
+          "type": "prompt",
+          "size_bytes": 92710
+        },
+        {
+          "name": "Claude-Design-Sys-Prompt",
+          "path": "claude/Claude-Design-Sys-Prompt.txt",
+          "type": "prompt",
+          "size_bytes": 73266
+        },
+        {
+          "name": "Claude-Fable-5.1",
+          "path": "claude/Claude-Fable-5.1.md",
+          "type": "prompt",
+          "size_bytes": 275723
+        },
+        {
+          "name": "Claude-Opus-4.7",
+          "path": "claude/Claude-Opus-4.7.txt",
+          "type": "prompt",
+          "size_bytes": 149724
+        },
+        {
+          "name": "Claude_4",
+          "path": "claude/Claude_4.txt",
+          "type": "prompt",
+          "size_bytes": 64487
+        },
+        {
+          "name": "Claude_Code_03-04-24",
+          "path": "claude/Claude_Code_03-04-24.md",
+          "type": "prompt",
+          "size_bytes": 1642
+        },
+        {
+          "name": "Claude_Opus_4.6",
+          "path": "claude/Claude_Opus_4.6.txt",
+          "type": "prompt",
+          "size_bytes": 102687
+        },
+        {
+          "name": "Claude_Sonnet-4.5_Sep-29-2025",
+          "path": "claude/Claude_Sonnet-4.5_Sep-29-2025.txt",
+          "type": "prompt",
+          "size_bytes": 85298
+        },
+        {
+          "name": "Claude_Sonnet_3.5",
+          "path": "claude/Claude_Sonnet_3.5.md",
+          "type": "prompt",
+          "size_bytes": 22967
+        },
+        {
+          "name": "Claude_Sonnet_3.7_New",
+          "path": "claude/Claude_Sonnet_3.7_New.txt",
+          "type": "prompt",
+          "size_bytes": 63413
+        },
+        {
+          "name": "OPUS-5",
+          "path": "claude/OPUS-5.md",
+          "type": "prompt",
+          "size_bytes": 202762
+        },
+        {
+          "name": "UserStyle_Modes",
+          "path": "claude/UserStyle_Modes.md",
+          "type": "prompt",
+          "size_bytes": 3749
+        }
+      ]
+    },
+    "cline": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "Cline",
+          "path": "cline/Cline.md",
+          "type": "prompt",
+          "size_bytes": 47221
+        }
+      ]
+    },
+    "cluely": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "Cluely",
+          "path": "cluely/Cluely.mkd",
+          "type": "prompt",
+          "size_bytes": 4771
+        }
+      ]
+    },
+    "cursor": {
+      "skill_count": 3,
+      "skills": [
+        {
+          "name": "Cursor_2.0_Sys_Prompt",
+          "path": "cursor/Cursor_2.0_Sys_Prompt.txt",
+          "type": "prompt",
+          "size_bytes": 23082
+        },
+        {
+          "name": "Cursor_Prompt",
+          "path": "cursor/Cursor_Prompt.md",
+          "type": "prompt",
+          "size_bytes": 5469
+        },
+        {
+          "name": "Cursor_Tools",
+          "path": "cursor/Cursor_Tools.md",
+          "type": "prompt",
+          "size_bytes": 7198
+        }
+      ]
+    },
+    "devin": {
+      "skill_count": 3,
+      "skills": [
+        {
+          "name": "Devin2_09-08-2025",
+          "path": "devin/Devin2_09-08-2025.md",
+          "type": "prompt",
+          "size_bytes": 50815
+        },
+        {
+          "name": "Devin_2.0",
+          "path": "devin/Devin_2.0.md",
+          "type": "prompt",
+          "size_bytes": 6056
+        },
+        {
+          "name": "Devin_2.0_Commands",
+          "path": "devin/Devin_2.0_Commands.md",
+          "type": "prompt",
+          "size_bytes": 29591
+        }
+      ]
+    },
+    "dia": {
+      "skill_count": 2,
+      "skills": [
+        {
+          "name": "Dia_CodingSkill",
+          "path": "dia/Dia_CodingSkill.txt",
+          "type": "prompt",
+          "size_bytes": 21506
+        },
+        {
+          "name": "Dia_DraftSkill",
+          "path": "dia/Dia_DraftSkill.txt",
+          "type": "prompt",
+          "size_bytes": 9088
+        }
+      ]
+    },
+    "factory": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "DROID",
+          "path": "factory/DROID.txt",
+          "type": "prompt",
+          "size_bytes": 16815
+        }
+      ]
+    },
+    "google": {
+      "skill_count": 3,
+      "skills": [
+        {
+          "name": "Gemini-2.5-Pro-04-18-2025",
+          "path": "google/Gemini-2.5-Pro-04-18-2025.md",
+          "type": "prompt",
+          "size_bytes": 11992
+        },
+        {
+          "name": "Gemini_Diffusion",
+          "path": "google/Gemini_Diffusion.md",
+          "type": "prompt",
+          "size_bytes": 6541
+        },
+        {
+          "name": "Gemini_Gmail_Assistant",
+          "path": "google/Gemini_Gmail_Assistant.txt",
+          "type": "prompt",
+          "size_bytes": 4554
+        }
+      ]
+    },
+    "hume": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "Hume_Voice_AI",
+          "path": "hume/Hume_Voice_AI.md",
+          "type": "prompt",
+          "size_bytes": 4436
+        }
+      ]
+    },
+    "lovable": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "Lovable_2.0",
+          "path": "lovable/Lovable_2.0.txt",
+          "type": "prompt",
+          "size_bytes": 16704
+        }
+      ]
+    },
+    "manus": {
+      "skill_count": 2,
+      "skills": [
+        {
+          "name": "Manus_Functions",
+          "path": "manus/Manus_Functions.txt",
+          "type": "prompt",
+          "size_bytes": 25950
+        },
+        {
+          "name": "Manus_Prompt",
+          "path": "manus/Manus_Prompt.txt",
+          "type": "prompt",
+          "size_bytes": 13972
+        }
+      ]
+    },
+    "meta": {
+      "skill_count": 2,
+      "skills": [
+        {
+          "name": "Llama4_WhatsApp",
+          "path": "meta/Llama4_WhatsApp.txt",
+          "type": "prompt",
+          "size_bytes": 3949
+        },
+        {
+          "name": "Muse_Spark_Apr-08-26",
+          "path": "meta/Muse_Spark_Apr-08-26.txt",
+          "type": "prompt",
+          "size_bytes": 49487
+        }
+      ]
+    },
+    "minimax": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "MiniMax",
+          "path": "minimax/MiniMax.txt",
+          "type": "prompt",
+          "size_bytes": 2495
+        }
+      ]
+    },
+    "mistral": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "LeChat",
+          "path": "mistral/LeChat.md",
+          "type": "prompt",
+          "size_bytes": 6630
+        }
+      ]
+    },
+    "moonshot": {
+      "skill_count": 2,
+      "skills": [
+        {
+          "name": "Kimi_2_July-11-2025",
+          "path": "moonshot/Kimi_2_July-11-2025.txt",
+          "type": "prompt",
+          "size_bytes": 1420
+        },
+        {
+          "name": "Kimi_K2_Thinking",
+          "path": "moonshot/Kimi_K2_Thinking.txt",
+          "type": "prompt",
+          "size_bytes": 955
+        }
+      ]
+    },
+    "multion": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "MultiOn",
+          "path": "multion/MultiOn.md",
+          "type": "prompt",
+          "size_bytes": 9311
+        }
+      ]
+    },
+    "openai": {
+      "skill_count": 18,
+      "skills": [
+        {
+          "name": "Atlas_10-21-25",
+          "path": "openai/Atlas_10-21-25.txt",
+          "type": "prompt",
+          "size_bytes": 33468
+        },
+        {
+          "name": "ChatGPT-4o_Sep-27-25",
+          "path": "openai/ChatGPT-4o_Sep-27-25.txt",
+          "type": "prompt",
+          "size_bytes": 8871
+        },
+        {
+          "name": "ChatGPT5-08-07-2025",
+          "path": "openai/ChatGPT5-08-07-2025.mkd",
+          "type": "prompt",
+          "size_bytes": 27816
+        },
+        {
+          "name": "ChatGPT_4.1_05-15-2025",
+          "path": "openai/ChatGPT_4.1_05-15-2025.txt",
+          "type": "prompt",
+          "size_bytes": 9216
+        },
+        {
+          "name": "ChatGPT_4o_04-25-2025",
+          "path": "openai/ChatGPT_4o_04-25-2025.txt",
+          "type": "prompt",
+          "size_bytes": 8626
+        },
+        {
+          "name": "ChatGPT_Personality_v2_Change",
+          "path": "openai/ChatGPT_Personality_v2_Change.md",
+          "type": "prompt",
+          "size_bytes": 1199
+        },
+        {
+          "name": "ChatGPT_o3_o4-mini_04-16-2025",
+          "path": "openai/ChatGPT_o3_o4-mini_04-16-2025",
+          "type": "other",
+          "size_bytes": 15434
+        },
+        {
+          "name": "ChatKit_Docs__Oct-6-25",
+          "path": "openai/ChatKit_Docs__Oct-6-25.txt",
+          "type": "prompt",
+          "size_bytes": 73121
+        },
+        {
+          "name": "Codex",
+          "path": "openai/Codex.md",
+          "type": "prompt",
+          "size_bytes": 6242
+        },
+        {
+          "name": "5.6-Sol_SystemPrompt",
+          "path": "openai/Codex_Desktop/5.6-Sol_SystemPrompt.md",
+          "type": "prompt",
+          "size_bytes": 300534
+        },
+        {
+          "name": "5.6-Sol_Tools",
+          "path": "openai/Codex_Desktop/5.6-Sol_Tools.json",
+          "type": "config",
+          "size_bytes": 394539
+        },
+        {
+          "name": "GPT-6-Astra_Prompts",
+          "path": "openai/Codex_Desktop/GPT-6-Astra_Prompts.md",
+          "type": "prompt",
+          "size_bytes": 338952
+        },
+        {
+          "name": "GPT-6-Astra_Tools",
+          "path": "openai/Codex_Desktop/GPT-6-Astra_Tools.json",
+          "type": "config",
+          "size_bytes": 1177481
+        },
+        {
+          "name": "GPT-6-Sol_Prompts",
+          "path": "openai/Codex_Desktop/GPT-6-Sol_Prompts.txt",
+          "type": "prompt",
+          "size_bytes": 161166
+        },
+        {
+          "name": "GPT-6-Sol_Tools",
+          "path": "openai/Codex_Desktop/GPT-6-Sol_Tools.json",
+          "type": "config",
+          "size_bytes": 139048
+        },
+        {
+          "name": "Codex_Sep-15-2025",
+          "path": "openai/Codex_Sep-15-2025.md",
+          "type": "prompt",
+          "size_bytes": 11753
+        },
+        {
+          "name": "GPT-4.5_02-27-25",
+          "path": "openai/GPT-4.5_02-27-25.md",
+          "type": "prompt",
+          "size_bytes": 8574
+        },
+        {
+          "name": "GPT-4o_Image_Gen_Postfill",
+          "path": "openai/GPT-4o_Image_Gen_Postfill.txt",
+          "type": "prompt",
+          "size_bytes": 278
+        }
+      ]
+    },
+    "perplexity": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "Perplexity_Deep_Research",
+          "path": "perplexity/Perplexity_Deep_Research.txt",
+          "type": "prompt",
+          "size_bytes": 7622
+        }
+      ]
+    },
+    "replit": {
+      "skill_count": 3,
+      "skills": [
+        {
+          "name": "Replit_Agent",
+          "path": "replit/Replit_Agent.md",
+          "type": "prompt",
+          "size_bytes": 6716
+        },
+        {
+          "name": "Replit_Functions",
+          "path": "replit/Replit_Functions.md",
+          "type": "prompt",
+          "size_bytes": 20786
+        },
+        {
+          "name": "Replit_Initial_Code_Generation_Prompt",
+          "path": "replit/Replit_Initial_Code_Generation_Prompt.md",
+          "type": "prompt",
+          "size_bytes": 4505
+        }
+      ]
+    },
+    "samedev": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "Same_Dev",
+          "path": "samedev/Same_Dev.txt",
+          "type": "prompt",
+          "size_bytes": 22145
+        }
+      ]
+    },
+    "vercel_v0": {
+      "skill_count": 1,
+      "skills": [
+        {
+          "name": "Vercel_v0",
+          "path": "vercel_v0/Vercel_v0.txt",
+          "type": "prompt",
+          "size_bytes": 20059
+        }
+      ]
+    },
+    "windsurf": {
+      "skill_count": 2,
+      "skills": [
+        {
+          "name": "Windsurf_Prompt",
+          "path": "windsurf/Windsurf_Prompt.md",
+          "type": "prompt",
+          "size_bytes": 8957
+        },
+        {
+          "name": "Windsurf_Tools",
+          "path": "windsurf/Windsurf_Tools.md",
+          "type": "prompt",
+          "size_bytes": 24803
+        }
+      ]
+    },
+    "xai": {
+      "skill_count": 7,
+      "skills": [
+        {
+          "name": "GROK-4-NEW_Jul-13-2025",
+          "path": "xai/GROK-4-NEW_Jul-13-2025",
+          "type": "other",
+          "size_bytes": 9869
+        },
+        {
+          "name": "GROK-4.1_Nov-17-2025",
+          "path": "xai/GROK-4.1_Nov-17-2025.txt",
+          "type": "prompt",
+          "size_bytes": 13739
+        },
+        {
+          "name": "GROK-4.20",
+          "path": "xai/GROK-4.20.mkd",
+          "type": "prompt",
+          "size_bytes": 15306
+        },
+        {
+          "name": "Grok-Code-Fast-1_Aug-26-2025",
+          "path": "xai/Grok-Code-Fast-1_Aug-26-2025.txt",
+          "type": "prompt",
+          "size_bytes": 3917
+        },
+        {
+          "name": "Grok3",
+          "path": "xai/Grok3.md",
+          "type": "prompt",
+          "size_bytes": 2851
+        },
+        {
+          "name": "Grok3_updated_07-08-2025",
+          "path": "xai/Grok3_updated_07-08-2025.md",
+          "type": "prompt",
+          "size_bytes": 3652
+        },
+        {
+          "name": "Grok4-July-10-2025",
+          "path": "xai/Grok4-July-10-2025.md",
+          "type": "prompt",
+          "size_bytes": 10090
+        }
+      ]
+    },
+    "zai": {
+      "skill_count": 3,
+      "skills": [
+        {
+          "name": "Prompts",
+          "path": "zai/ZCode/Prompts.md",
+          "type": "prompt",
+          "size_bytes": 131706
+        },
+        {
+          "name": "Skills",
+          "path": "zai/ZCode/Skills.md",
+          "type": "prompt",
+          "size_bytes": 191582
+        },
+        {
+          "name": "Tools",
+          "path": "zai/ZCode/Tools.json",
+          "type": "config",
+          "size_bytes": 70804
+        }
+      ]
+    }
+  }
+}
