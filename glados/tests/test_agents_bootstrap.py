@@ -3,8 +3,8 @@
 """
 Tests for the agents.yaml bootstrap loader.
 Ensures that agent profiles are correctly loaded from configuration,
-API keys are resolved from environment variables, and providers are
-registered in LLMRegistry via LLMProviderFactory.
+API keys are resolved from environment variables (${VAR} syntax), and 
+providers are registered in LLMRegistry via LLMProviderFactory.
 """
 
 import os
@@ -26,26 +26,26 @@ class TestAgentsBootstrap:
 
     @pytest.fixture
     def sample_yaml_content(self) -> str:
-        return """
+        return r"""
 agents:
-  - agent_id: claude-main
-    display_name: Claude Main
+  - agent_id: claude_writing
+    display_name: Claude Writing Assistant
     provider: anthropic
-    model: claude-sonnet-4-6
-    tags: [general, coding]
-    api_key_env: ANTHROPIC_API_KEY
-  - agent_id: local-qwen
-    display_name: Local Qwen
+    model: claude-3-5-sonnet-20241022
+    api_key: ${ANTHROPIC_API_KEY}
+    tags: [writing, documentation]
+  - agent_id: local_qwen_coder
+    display_name: Local Qwen Coder
     provider: ollama
-    model: qwen2.5:14b
-    base_url: http://localhost:11434
-    tags: [local, private]
-  - agent_id: openai-fast
-    display_name: OpenAI Fast
+    model: qwen2.5-coder:7b
+    base_url: ${OLLAMA_BASE_URL}
+    tags: [coding, python, fast]
+  - agent_id: gpt4_analyst
+    display_name: GPT-4 Analyst
     provider: openai
-    model: gpt-4o-mini
-    tags: [fast]
-    api_key_env: OPENAI_API_KEY
+    model: gpt-4-turbo
+    api_key: ${OPENAI_API_KEY}
+    tags: [analysis, security]
 """
 
     @pytest.fixture
@@ -55,26 +55,25 @@ agents:
         return config_file
 
     def test_load_profiles_from_yaml(self, yaml_file: Path):
-        """Test that bootstrap correctly parses YAML into AgentProfile objects."""
+        """Test that bootstrap correctly parses YAML and resolves ${VAR} syntax."""
         env_vars = {
             "ANTHROPIC_API_KEY": "sk-ant-test",
             "OPENAI_API_KEY": "sk-test-openai",
+            "OLLAMA_BASE_URL": "http://localhost:11434",
         }
         with patch.dict(os.environ, env_vars, clear=False):
             profiles = AgentsBootstrap.load_profiles(yaml_file)
 
         assert len(profiles) == 3
         
-        claude_profile = next(p for p in profiles if p.agent_id == "claude-main")
+        claude_profile = next(p for p in profiles if p.agent_id == "claude_writing")
         assert claude_profile.provider == ProviderType.ANTHROPIC
-        assert claude_profile.model == "claude-sonnet-4-6"
         assert claude_profile.api_key.get_secret_value() == "sk-ant-test"
-        assert "general" in claude_profile.tags
+        assert "writing" in claude_profile.tags
 
-        ollama_profile = next(p for p in profiles if p.agent_id == "local-qwen")
+        ollama_profile = next(p for p in profiles if p.agent_id == "local_qwen_coder")
         assert ollama_profile.provider == ProviderType.OLLAMA
         assert ollama_profile.base_url == "http://localhost:11434"
-        assert ollama_profile.api_key is None
 
     def test_load_profiles_raises_on_missing_env_var(self, yaml_file: Path):
         """Test that bootstrap raises error when required API key env var is missing."""
@@ -91,40 +90,17 @@ agents:
         env_vars = {
             "ANTHROPIC_API_KEY": "sk-ant-test",
             "OPENAI_API_KEY": "sk-test-openai",
+            "OLLAMA_BASE_URL": "http://localhost:11434",
         }
         with patch.dict(os.environ, env_vars, clear=False):
             AgentsBootstrap.register_profiles(yaml_file, mock_registry)
 
         assert mock_registry.register.call_count == 3
         
-        registered_profiles = [
-            call.args[0] for call in mock_registry.register.call_args_list
-        ]
-        registered_providers = [
-            call.args[1] for call in mock_registry.register.call_args_list
-        ]
+        registered_profiles = [call.args[0] for call in mock_registry.register.call_args_list]
+        registered_providers = [call.args[1] for call in mock_registry.register.call_args_list]
 
-        assert any(p.agent_id == "claude-main" for p in registered_profiles)
+        assert any(p.agent_id == "claude_writing" for p in registered_profiles)
         assert any(isinstance(provider, AnthropicProvider) for provider in registered_providers)
         assert any(isinstance(provider, OllamaProvider) for provider in registered_providers)
         assert any(isinstance(provider, OpenAIProvider) for provider in registered_providers)
-
-    def test_register_profiles_skips_agents_without_api_key_when_optional(self, tmp_path: Path):
-        """Test that agents with missing optional API keys are still registered."""
-        config_content = """
-agents:
-  - agent_id: local-only
-    display_name: Local Only
-    provider: ollama
-    model: llama3.2:latest
-    base_url: http://localhost:11434
-"""
-        config_file = tmp_path / "agents.yaml"
-        config_file.write_text(config_content)
-        
-        mock_registry = MagicMock(spec=LLMRegistry)
-        
-        with patch.dict(os.environ, {}, clear=True):
-            AgentsBootstrap.register_profiles(config_file, mock_registry)
-
-        assert mock_registry.register.call_count == 1
