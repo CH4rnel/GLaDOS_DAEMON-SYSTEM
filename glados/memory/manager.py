@@ -1,4 +1,4 @@
-# ♃ ☿ 𓂀  OMNISSIAH CODE LAYER 𓂀  ☿ ♃
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
 Memory Manager.
@@ -7,10 +7,11 @@ Acts as a Facade for the memory subsystem, unifying short-term and long-term ope
 
 import math
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from loguru import logger
 
+from glados.llm.embeddings.base import BaseEmbeddingProvider
 from glados.memory.models import MemoryRecord
 from glados.memory.short_term import ShortTermMemory
 from glados.memory.long_term import LongTermMemory
@@ -22,21 +23,56 @@ class MemoryManager:
     Coordinates interactions between STM and LTM.
     """
 
-    def __init__(self, stm_max_size: int = 50, ltm_path: Path | None = None) -> None:
+    def __init__(
+        self, 
+        stm_max_size: int = 50, 
+        ltm_path: Path | None = None,
+        embedding_provider: Optional[BaseEmbeddingProvider] = None
+    ) -> None:
         self.logger = logger.bind(component="MemoryManager")
         
         self.stm = ShortTermMemory(max_size=stm_max_size)
         
         if ltm_path is None:
-            ltm_path = Path("data/long_term_memory.json")
+            ltm_path = Path("data/long_term_memory.db")
             
         self.ltm = LongTermMemory(storage_path=ltm_path)
+        self.embedding_provider = embedding_provider
         
-        self.logger.info("MemoryManager initialized.")
+        self.logger.info(
+            f"MemoryManager initialized (embeddings: {'enabled' if embedding_provider else 'disabled'})"
+        )
 
-    def remember(self, content: str, role: str = "system", persist: bool = False, metadata: dict | None = None, embedding: list[float] | None = None) -> None:
-        record = MemoryRecord(content=content, role=role, metadata=metadata or {}, embedding=embedding)
+    async def remember(
+        self, 
+        content: str, 
+        role: str = "system", 
+        persist: bool = False, 
+        metadata: dict | None = None, 
+        embedding: list[float] | None = None
+    ) -> None:
+        """
+        Stores a memory record in STM and optionally in LTM.
+        If persist=True and embedding_provider is configured, automatically generates embedding.
+        """
+        # Generate embedding if needed and provider is available
+        if persist and embedding is None and self.embedding_provider is not None:
+            try:
+                embedding = await self.embedding_provider.embed(content)
+                self.logger.debug(f"Generated embedding for: {content[:50]}...")
+            except Exception as e:
+                self.logger.warning(f"Failed to generate embedding: {e}")
+                # Continue without embedding (graceful degradation)
+        
+        record = MemoryRecord(
+            content=content, 
+            role=role, 
+            metadata=metadata or {}, 
+            embedding=embedding
+        )
+        
         self.stm.add(record)
+        
         if persist:
             self.ltm.save(record)
             self.logger.debug(f"Memory persisted to LTM: {content[:30]}...")
@@ -52,18 +88,27 @@ class MemoryManager:
     def search_long_term(self, query: str) -> list[MemoryRecord]:
         return self.ltm.search(query)
 
-    async def search_semantic(self, query_embedding: list[float], top_k: int = 5, threshold: float = 0.0) -> list[MemoryRecord]:
+    async def search_semantic(
+        self, 
+        query_embedding: list[float], 
+        top_k: int = 5, 
+        threshold: float = 0.0
+    ) -> list[MemoryRecord]:
         """
-        Performs semantic search on short-term memory using cosine similarity.
+        Performs semantic search across both STM and LTM using cosine similarity.
         """
-        context = self.stm.get_context()
+        # Combine STM and LTM records
+        stm_context = self.stm.get_context()
+        ltm_records = self.ltm.load_all()
+        all_records = stm_context + ltm_records
+        
         scored_records: list[tuple[float, MemoryRecord]] = []
         
         query_norm = math.sqrt(sum(x * x for x in query_embedding))
         if query_norm == 0:
             return []
             
-        for record in context:
+        for record in all_records:
             if not record.embedding:
                 continue
             
