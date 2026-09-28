@@ -155,3 +155,17 @@ def log_missing_policy(component: str) -> None:
         f"running WITHOUT Guardian enforcement. This is expected in unit tests, "
         f"not in a running daemon."
     )
+
+    def check_fleet_objective(self, objective: str) -> None:
+        """
+        Verifies if a fleet task objective is allowed.
+        Fail-closed: blocks objectives containing disallowed patterns.
+        """
+        # Example: block shell execution patterns
+        disallowed_patterns = ["rm -rf", "sudo", "chmod 777", "eval(", "exec("]
+        
+        for pattern in disallowed_patterns:
+            if pattern.lower() in objective.lower():
+                raise PolicyViolation(
+                    f"Fleet objective contains disallowed pattern: '{pattern}'"
+                )
