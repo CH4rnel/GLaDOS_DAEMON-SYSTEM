@@ -1,6 +1,18 @@
-# ♃ ☿ 𓂀  OMNISSIAH CODE LAYER 𓂀  ☿ ♃
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
-Autonomous background tasks for the GLaDOS Daemon.
-These tasks are registered with the Scheduler and executed periodically.
+GLaDOS Autonomous Tasks.
+Scheduled background tasks for memory consolidation, diagnostics, and self-audit.
 """
+
+from glados.autonomous.tasks.self_audit_tasks import (
+    run_dependency_audit,
+    run_static_analysis,
+    AuditReport,
+)
+
+__all__ = [
+    "run_dependency_audit",
+    "run_static_analysis",
+    "AuditReport",
+]
