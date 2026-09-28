@@ -141,3 +141,25 @@ class LongTermMemory:
             metadata=json.loads(row["metadata"]) if row["metadata"] else {},
             embedding=json.loads(row["embedding"]) if row["embedding"] else None
         )
+
+    def get_recent(self, days: int = 7) -> list[MemoryRecord]:
+        """
+        Retrieves memory records from the last N days.
+        
+        :param days: Number of days to look back.
+        :return: List of recent MemoryRecord objects.
+        """
+        from datetime import datetime, timedelta, timezone
+        
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+        
+        with sqlite3.connect(self._path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id, content, role, timestamp, metadata, embedding FROM memory_records WHERE timestamp >= ?",
+                (cutoff.isoformat(),)
+            )
+            rows = cursor.fetchall()
+        
+        return [self._row_to_record(row) for row in rows]
