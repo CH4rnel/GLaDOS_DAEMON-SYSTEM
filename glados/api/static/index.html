@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLaDOS_DAEMON CONSOLE v0.1.0</title>
+    <link rel="stylesheet" href="/static/css/hud.css">
+</head>
+<body>
+    <div class="scanline"></div>
+    <div class="hud-container">
+        <header class="hud-header">
+            <h1>GLaDOS_DAEMON <span class="version">v0.1.0</span></h1>
+            <div class="status-indicator"><span class="blink">CONNECTED</span></div>
+        </header>
+
+        <main class="hud-main">
+            <!-- Left Panel: Roster & Resources -->
+            <aside class="hud-panel left-panel">
+                <div class="panel-section">
+                    <h2>AGENT ROSTER</h2>
+                    <select id="agent-select" class="hev-select">
+                        <option value="">INITIALIZING...</option>
+                    </select>
+                    <div id="agent-status" class="status-text">WAITING FOR UPLINK</div>
+                </div>
+
+                <div class="panel-section">
+                    <h2>RESOURCES</h2>
+                    <div class="resource-bar">
+                        <span>CPU</span>
+                        <div class="bar-track"><div class="bar-fill" style="width: 12%;"></div></div>
+                    </div>
+                    <div class="resource-bar">
+                        <span>MEM</span>
+                        <div class="bar-track"><div class="bar-fill" style="width: 34%;"></div></div>
+                    </div>
+                    <div class="resource-bar">
+                        <span>TOKENS</span>
+                        <div class="bar-track"><div class="bar-fill" style="width: 5%;"></div></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Panel: Chat -->
+            <section class="hud-panel center-panel">
+                <h2>CHAT — OPERATOR ⇄ GLaDOS</h2>
+                <div id="chat-box" class="chat-box"></div>
+                <div class="chat-input-area">
+                    <span class="prompt">&gt;</span>
+                    <input type="text" id="chat-input" class="hev-input" placeholder="Enter command or query..." autocomplete="off">
+                    <button id="send-btn" class="hev-button">TRANSMIT</button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Guardian Gate -->
+            <aside class="hud-panel right-panel">
+                <h2>GUARDIAN GATE — AUDIT LOG</h2>
+                <div id="audit-log" class="audit-log-box">
+                    <div class="log-entry system">Awaiting telemetry...</div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Cache busting parameter to force browser reload -->
+    <script src="/static/js/console.js?v=2"></script>
+</body>
+</html>
