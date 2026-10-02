@@ -6,7 +6,7 @@ version = "0.1.0"
 description = "Personal Autonomous AI Daemon for Arch Linux focused on system management, knowledge processing and future autonomous operation."
 readme = "README.md"
 requires-python = ">=3.14"
-license = { text = "Apache-2.0" }
+license = { text = "Apache Software License" }
 authors = [
     { name = "CH4rnel", email = "CH4rnel@glados.local" }
 ]
@@ -15,7 +15,7 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache-2.0 License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -30,6 +30,9 @@ dependencies = [
     "rich>=15.0.0",
     "typer>=0.27.0",
     "httpx>=0.28.1",
+    "fastapi>=0.142.2",
+    "uvicorn[standard]>=0.54.0",
+    "websockets>=17.1",
 ]
 
 [project.optional-dependencies]
