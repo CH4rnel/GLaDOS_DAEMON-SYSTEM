@@ -7,8 +7,8 @@ GuardianGate — single choke point for tool dispatch.
 Actual policy enforcement lives inside each tool (see policy.py docstring
 for why). GuardianGate's job is narrower but still important:
 
-1. It's the one place BrainEngine's Planner (Phase 7 — currently a TODO in
-   brain/engine.py) should call through, instead of reaching into
+1. It's the one place BrainEngine's Planner
+   should call through, instead of reaching into
    ToolRegistry directly. That gives future-us a single point to extend
    with rate limiting, per-task budgets, or a human-approval hook, without
    touching every tool.
@@ -53,3 +53,22 @@ class GuardianGate:
 
         self.logger.info(f"guardian_allow tool={name}")
         return result
+# In-memory bounded ring buffer for audit logs (Web API requirement)
+_audit_log_buffer: list[dict[str, Any]] = []
+_MAX_BUFFER_SIZE = 1000
+
+def get_guardian_logs(limit: int = 50) -> list[dict[str, Any]]:
+    """
+    Retrieves recent audit logs from the in-memory ring buffer.
+    Used by the /api/v1/audit REST endpoint for the HEV-HUD tool console.
+    """
+    return _audit_log_buffer[-limit:]
+
+def append_audit_log(entry: dict[str, Any]) -> None:
+    """
+    Appends an entry to the audit log buffer, maintaining bounded size.
+    Should be called by GuardianGate on every allow/deny decision.
+    """
+    _audit_log_buffer.append(entry)
+    if len(_audit_log_buffer) > _MAX_BUFFER_SIZE:
+        _audit_log_buffer.pop(0)
