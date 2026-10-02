@@ -23,6 +23,8 @@ class ProviderType(str, Enum):
     ANTHROPIC = "anthropic"      # Claude
     XAI = "xai"                  # Grok
     DEEPSEEK = "deepseek"
+    GROQ = "groq"           
+    QWEN = "qwen"
     OPENROUTER = "openrouter"
     GOOGLE = "google"            # Gemini
     MISTRAL = "mistral"
