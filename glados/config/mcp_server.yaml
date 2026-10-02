@@ -1,0 +1,23 @@
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
+
+# MCP Server Configuration
+# Defines which tools GLaDOS exposes to external MCP clients.
+# All tool calls are audited through GuardianGate.
+
+server:
+  name: glados-daemon
+  transport: stdio
+  
+  # Tools to expose (empty = expose all from ToolRegistry)
+  # If specified, only these tools will be visible to MCP clients
+  exposed_tools: []
+  
+  # Security: require explicit approval for these tools
+  restricted_tools:
+    - "shell_exec"
+    - "file_write"
+    - "git_commit"
+  
+  # Logging
+  audit_enabled: true
+  log_level: INFO
