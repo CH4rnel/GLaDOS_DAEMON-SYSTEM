@@ -1,0 +1,19 @@
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
+
+# MCP Client Configuration
+# Defines external MCP servers that GLaDOS can connect to for tool execution.
+
+clients:
+  - name: filesystem
+    transport: stdio
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+    enabled: true
+    env: {}
+
+  - name: memory
+    transport: stdio
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-memory"]
+    enabled: false
+    env: {}
