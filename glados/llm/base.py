@@ -1,67 +1,38 @@
 # ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
-Base interfaces for the GLaDOS LLM subsystem.
-Defines the abstract contracts that all LLM providers and agents must implement.
+Base LLM Provider interface for GLaDOS.
+All provider implementations must conform to this contract.
 """
 
 from abc import ABC, abstractmethod
-from typing import AsyncGenerator
-from loguru import logger
+from typing import AsyncIterator
 from glados.llm.models import AgentProfile, LLMMessage, LLMResponse
 
 
 class BaseLLMProvider(ABC):
-    """
-    Abstract base class for all LLM provider implementations.
-    A provider handles the low-level transport and API-specific logic 
-    for communicating with a specific LLM service (e.g., Ollama, OpenAI).
-    """
+    """Abstract base class for all LLM provider implementations."""
 
     @abstractmethod
-    async def complete(
-        self, 
-        messages: list[LLMMessage], 
-        profile: AgentProfile
-    ) -> LLMResponse:
+    async def complete(self, messages: list[LLMMessage], profile: AgentProfile) -> LLMResponse:
         """
-        Sends a list of messages to the LLM and returns a single response.
+        Execute a single completion request and return the full response.
         
-        :param messages: The conversation history.
-        :param profile: The agent profile containing model and connection details.
-        :return: A structured LLMResponse.
+        :param messages: List of conversation messages.
+        :param profile: Agent profile with model and configuration.
+        :return: Complete LLM response.
         """
         pass
 
-    @abstractmethod
-    async def health_check(self, profile: AgentProfile) -> bool:
+    async def complete_stream(self, messages: list[LLMMessage], profile: AgentProfile) -> AsyncIterator[str]:
         """
-        Checks if the provider and the specific model are reachable and responsive.
+        Stream completion response as async generator yielding text chunks.
+        Default implementation falls back to complete() and yields the full content as single chunk.
+        Providers with native streaming support should override this method.
         
-        :param profile: The agent profile to check.
-        :return: True if healthy, False otherwise.
+        :param messages: List of conversation messages.
+        :param profile: Agent profile with model and configuration.
+        :yields: Text chunks as they are generated.
         """
-        pass
-
-    """
-    BrainEngine orchestration layer.
-    Routes messages through LLMRouter and supports streaming responses.
-    """
-class BrainEngine:
-    """
-    Core reasoning engine that interfaces with the LLM fleet.
-    """
-
-    def __init__(self, agent_id: str) -> None:
-        self.agent_id = agent_id
-        logger.debug(f"BrainEngine initialized for agent: {agent_id}")
-
-    async def process_stream(self, message: str) -> AsyncGenerator[str, None]:
-        """
-        Yields chunks of the LLM response for WebSocket streaming.
-        In production, this routes through LLMRouter to the selected provider.
-        """
-        # Stub implementation for TDD green phase
-        # Real implementation will invoke LLMRouter.stream()
-        yield "Thinking..."
-        yield "Done."
+        response = await self.complete(messages, profile)
+        yield response.content
