@@ -1,14 +1,11 @@
 # ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
-LLM Providers package for GLaDOS_DAEMON-SYSTEM.
-Contains implementations for various LLM providers (Ollama, OpenAI, etc.).
+LLM Provider implementations for GLaDOS.
 """
 
-from glados.llm.providers.ollama import OllamaProvider
+from glados.llm.providers.anthropic import AnthropicProvider
 from glados.llm.providers.openai import OpenAIProvider
+from glados.llm.providers.ollama import OllamaProvider
 
-__all__ = [
-    "OllamaProvider",
-    "OpenAIProvider",
-]
+__all__ = ["AnthropicProvider", "OpenAIProvider", "OllamaProvider"]
