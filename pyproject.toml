@@ -33,6 +33,8 @@ dependencies = [
     "fastapi>=0.142.2",
     "uvicorn[standard]>=0.54.0",
     "websockets>=17.1",
+    "openai>=3.23.0",
+    "anthropic>=1.11.0",
 ]
 
 [project.optional-dependencies]
