@@ -75,13 +75,14 @@ agents:
         assert ollama_profile.provider == ProviderType.OLLAMA
         assert ollama_profile.base_url == "http://localhost:11434"
 
-    def test_load_profiles_raises_on_missing_env_var(self, yaml_file: Path):
-        """Test that bootstrap raises error when required API key env var is missing."""
+    def test_load_profiles_skips_agents_without_api_key(self, yaml_file: Path):
+        """Test that bootstrap gracefully skips agents when required API key env var is missing."""
         with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(ValueError) as exc_info:
-                AgentsBootstrap.load_profiles(yaml_file)
-            
-            assert "ANTHROPIC_API_KEY" in str(exc_info.value)
+            profiles = AgentsBootstrap.load_profiles(yaml_file)
+        
+        assert len(profiles) == 1
+        assert profiles[0].agent_id == "local_qwen_coder"
+        assert profiles[0].base_url is None
 
     def test_register_profiles_creates_providers(self, yaml_file: Path):
         """Test that register_profiles creates providers and populates LLMRegistry."""
