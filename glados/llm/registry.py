@@ -6,6 +6,7 @@ Centralized storage and retrieval of agent profiles and their providers.
 """
 
 from loguru import logger
+from typing import Optional
 
 from glados.llm.base import BaseLLMProvider
 from glados.llm.models import AgentProfile, ProviderType
@@ -29,12 +30,12 @@ class LLMRegistry:
         self.logger = logger.bind(component="LLMRegistry")
         self.logger.debug("LLMRegistry initialized.")
 
-    def register(self, profile: AgentProfile, provider: BaseLLMProvider) -> None:
+    def register(self, profile: AgentProfile, provider: Optional[BaseLLMProvider] = None) -> None:
         """
         Registers a new agent profile and its provider in the registry.
         
         :param profile: The agent profile to register.
-        :param provider: The instantiated LLM provider for this agent.
+        :param provider: The instantiated LLM provider (None if agent is inactive).
         :raises ValueError: If an agent with the same ID is already registered.
         """
         agent_id = profile.agent_id
@@ -43,8 +44,11 @@ class LLMRegistry:
             raise ValueError(f"Agent with ID '{agent_id}' is already registered.")
         
         self._agents[agent_id] = profile
-        self._providers[agent_id] = provider
-        self.logger.info(f"Registered agent: {agent_id} ({profile.display_name})")
+        if provider is not None:
+            self._providers[agent_id] = provider
+            
+        status = "ACTIVE" if provider else "INACTIVE (missing key)"
+        self.logger.info(f"Registered agent: {agent_id} ({profile.display_name}) [{status}]")
 
     def unregister(self, agent_id: str) -> None:
         """
@@ -57,7 +61,7 @@ class LLMRegistry:
             raise AgentNotFoundError(f"Agent '{agent_id}' not found in registry.")
         
         del self._agents[agent_id]
-        del self._providers[agent_id]
+        self._providers.pop(agent_id, None)
         self.logger.info(f"Unregistered agent: {agent_id}")
 
     def get(self, agent_id: str) -> AgentProfile:
@@ -69,13 +73,10 @@ class LLMRegistry:
     def get_provider(self, agent_id: str) -> BaseLLMProvider:
         """
         Retrieves the LLM provider for a specific agent.
-        
-        :param agent_id: The ID of the agent.
-        :return: The BaseLLMProvider instance.
-        :raises AgentNotFoundError: If the agent is not registered.
+        :raises AgentNotFoundError: If the agent is not registered or has no provider.
         """
         if agent_id not in self._providers:
-            raise AgentNotFoundError(f"Provider for agent '{agent_id}' not found in registry.")
+            raise AgentNotFoundError(f"Provider for agent '{agent_id}' not found or agent is inactive.")
         return self._providers[agent_id]
 
     def get_by_tag(self, tag: str) -> list[AgentProfile]:
