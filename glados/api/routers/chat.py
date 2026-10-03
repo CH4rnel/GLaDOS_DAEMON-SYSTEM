@@ -1,4 +1,4 @@
-# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
+# ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀  ♃
 
 """
 WebSocket router for streaming chat interactions with the BrainEngine.
@@ -8,8 +8,6 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from loguru import logger
 
 from glados.api.schemas import ChatRequest
-from glados.llm.factory import LLMProviderFactory
-from glados.llm.models import LLMMessage
 
 router = APIRouter()
 
@@ -31,6 +29,7 @@ async def websocket_chat(websocket: WebSocket):
 
             try:
                 profile = registry.get(request_data.agent_id)
+                provider = registry.get_provider(request_data.agent_id)
             except Exception as e:
                 logger.error(f"Agent not found: {request_data.agent_id}. Error: {e}")
                 await websocket.send_json({
@@ -39,7 +38,7 @@ async def websocket_chat(websocket: WebSocket):
                 })
                 continue
 
-            provider = LLMProviderFactory.create_provider(profile)
+            from glados.llm.models import LLMMessage
             messages = [LLMMessage(role="user", content=request_data.message)]
 
             try:
