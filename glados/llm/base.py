@@ -6,33 +6,22 @@ All provider implementations must conform to this contract.
 """
 
 from abc import ABC, abstractmethod
-from typing import AsyncIterator
+from typing import AsyncGenerator
+
 from glados.llm.models import AgentProfile, LLMMessage, LLMResponse
 
-
 class BaseLLMProvider(ABC):
-    """Abstract base class for all LLM provider implementations."""
+    def __init__(self, profile: AgentProfile) -> None:
+        self.profile = profile
 
     @abstractmethod
-    async def complete(self, messages: list[LLMMessage], profile: AgentProfile) -> LLMResponse:
-        """
-        Execute a single completion request and return the full response.
-        
-        :param messages: List of conversation messages.
-        :param profile: Agent profile with model and configuration.
-        :return: Complete LLM response.
-        """
+    async def complete(self, messages: list[LLMMessage], **kw) -> LLMResponse:
         pass
 
-    async def complete_stream(self, messages: list[LLMMessage], profile: AgentProfile) -> AsyncIterator[str]:
-        """
-        Stream completion response as async generator yielding text chunks.
-        Default implementation falls back to complete() and yields the full content as single chunk.
-        Providers with native streaming support should override this method.
-        
-        :param messages: List of conversation messages.
-        :param profile: Agent profile with model and configuration.
-        :yields: Text chunks as they are generated.
-        """
-        response = await self.complete(messages, profile)
-        yield response.content
+    @abstractmethod
+    async def complete_stream(self, messages: list[LLMMessage], profile: AgentProfile) -> AsyncGenerator[str, None]:
+        pass
+
+    async def validate_api_key(self) -> bool:
+        """Default validation: attempts a lightweight API call."""
+        return False
