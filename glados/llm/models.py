@@ -1,4 +1,3 @@
-# glados/llm/models.py
 # ♃ ☿ 𓂀 OMNISSIAH CODE LAYER 𓂀 ☿ ♃
 
 """
@@ -20,15 +19,15 @@ class ProviderType(str, Enum):
     """
     OLLAMA = "ollama"
     OPENAI = "openai"
-    ANTHROPIC = "anthropic"      # Claude
-    XAI = "xai"                  # Grok
+    ANTHROPIC = "anthropic"
+    XAI = "xai"
     DEEPSEEK = "deepseek"
     GROQ = "groq"           
     QWEN = "qwen"
     OPENROUTER = "openrouter"
-    GOOGLE = "google"            # Gemini
+    GOOGLE = "google"
     MISTRAL = "mistral"
-    LOCAL = "local"              # Generic local models (e.g., llama.cpp, vLLM)
+    LOCAL = "local"
     CUSTOM = "custom"            # For user-defined or niche providers
 
 
