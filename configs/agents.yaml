@@ -4,36 +4,67 @@
 # Environment variables can be substituted using ${VAR_NAME} syntax
 
 agents:
+  # ==========================================
+  # LOCAL PROVIDER (Default, No Limits)
+  # ==========================================
   - agent_id: local_qwen_coder
-    display_name: Local Qwen Coder
+    display_name: Local Qwen Coder (Ollama)
     provider: ollama
     model: qwen2.5-coder:7b
     base_url: ${OLLAMA_BASE_URL}
     system_prompt: "You are an expert Python developer. Write clean, efficient, and well-documented code."
     temperature: 0.3
-    tags: ["coding", "python", "fast"]
+    max_tokens: 1024
+    tags: ["local", "coding", "unlimited", "default"]
 
-  - agent_id: gpt4_analyst
-    display_name: GPT-4 Analyst
-    provider: openai
-    model: gpt-4-turbo
-    api_key: ${OPENAI_API_KEY}
-    system_prompt: "You are a system analyst. Analyze logs, identify anomalies, and provide actionable insights."
-    temperature: 0.5
-    tags: ["analysis", "security", "deep-thinking"]
+  # ==========================================
+  # GOOGLE GEMINI (Free Tier)
+  # ==========================================
+  - agent_id: gemini-flash
+    display_name: Gemini 1.5 Flash (Free Tier)
+    provider: google
+    model: models/gemini-1.5-flash-latest
+    api_key: ${GOOGLE_API_KEY}
+    system_prompt: "You are a fast, free-tier test agent."
+    temperature: 0.7
+    max_tokens: 512
+    tags: ["free", "testing", "fast"]
 
-  - agent_id: groq-fast
-    display_name: Groq Fast Inference
+  # ==========================================
+  # MISTRAL (Free Tier)
+  # ==========================================
+  - agent_id: mistral-small
+    display_name: Mistral Small (Free Tier)
+    provider: mistral
+    model: mistral-small-latest
+    api_key: ${MISTRAL_API_KEY}
+    system_prompt: "You are a helpful and efficient AI assistant."
+    temperature: 0.7
+    max_tokens: 512
+    tags: ["free", "testing", "balanced"]
+
+  # ==========================================
+  # DEEPSEEK
+  # ==========================================
+  - agent_id: deepseek-chat
+    display_name: DeepSeek Chat
+    provider: deepseek
+    model: deepseek-chat
+    api_key: ${DEEPSEEK_API_KEY}
+    system_prompt: "You are a helpful AI assistant specialized in coding and logical reasoning."
+    temperature: 0.7
+    max_tokens: 1024
+    tags: ["coding", "chat", "reasoning"]
+
+  # ==========================================
+  # GROQ (Cloud Fallback)
+  # ==========================================
+  - agent_id: groq-qwen
+    display_name: Groq Qwen (Fast Inference)
     provider: groq
     model: qwen/qwen3.8-27b
     api_key: ${GROQ_API_KEY}
-    tags: ["fast", "remote", "testing"]
-    
-  - agent_id: claude_writing
-    display_name: Claude Writing Assistant
-    provider: anthropic
-    model: claude-3-5-sonnet-20241022
-    api_key: ${ANTHROPIC_API_KEY}
-    system_prompt: "You are a technical writer. Create clear, concise, and well-structured documentation."
+    system_prompt: "You are a highly optimized, fast AI assistant running on Groq infrastructure."
     temperature: 0.7
-    tags: ["writing", "documentation"]
+    max_tokens: 256
+    tags: ["fast", "remote", "testing"]
