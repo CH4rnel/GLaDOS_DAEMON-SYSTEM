@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
     logger.info("GLaDOS API Core initializing shared state...")
     
     app.state.tool_registry = ToolRegistry()
-    app.state.guardian = GuardianGate(registry=app.state.tool_registry)
+    app.state.guardian_gate = GuardianGate(registry=app.state.tool_registry)
     app.state.llm_registry = LLMRegistry()
     
     agents_config = CONFIG_DIR / "agents.yaml"
@@ -56,7 +56,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Explicitly allowed sources to prevent 403 Forbidden errors in the browser
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:8000", "http://127.0.0.1:8000", "null"],
@@ -68,11 +67,9 @@ app.add_middleware(
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-# Router registration
 app.include_router(chat.router)
 app.include_router(agents.router)
 app.include_router(audit.router)
-
 
 @app.get("/")
 async def serve_index():
