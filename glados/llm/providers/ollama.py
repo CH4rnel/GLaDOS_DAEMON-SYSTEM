@@ -83,3 +83,10 @@ class OllamaProvider(BaseLLMProvider):
         for msg in messages:
             conversation.append({"role": msg.role, "content": msg.content})
         return conversation
+
+    async def validate_api_key(self) -> bool:
+        try:
+            resp = await self._client.get("/api/tags")
+            return resp.status_code == 200
+        except Exception:
+            return False
