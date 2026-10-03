@@ -71,3 +71,10 @@ class AnthropicProvider(BaseLLMProvider):
     def _format_messages(self, messages: list[LLMMessage]) -> list[dict]:
         """Convert LLMMessage list to Anthropic message format."""
         return [{"role": msg.role, "content": msg.content} for msg in messages]
+
+    async def validate_api_key(self) -> bool:
+        try:
+            resp = await self._client.get("/v1/models")
+            return resp.status_code == 200
+        except Exception:
+            return False
