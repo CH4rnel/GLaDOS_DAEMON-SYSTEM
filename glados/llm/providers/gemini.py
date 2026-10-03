@@ -9,7 +9,6 @@ class GeminiProvider(OpenAICompatibleProvider):
     DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
     
     def __init__(self, profile: AgentProfile) -> None:
-        # Gemini требует префикса "models/" для имени модели
         profile_with_prefix = profile.model_copy()
         if not profile.model.startswith("models/"):
             profile_with_prefix.model = f"models/{profile.model}"
